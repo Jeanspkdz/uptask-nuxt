@@ -1,5 +1,5 @@
 <template>
-  <div class="w-dvw h-dvh bg-[#1c2430] grid place-content-center">
+  <div class="max-w-dvw h-full min-h-dvh bg-[#1c2430] grid place-content-center py-6">
       <LogoApp class="mb-8 justify-self-center"/>
       <slot />
   </div>

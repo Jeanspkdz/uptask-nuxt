@@ -1,14 +1,10 @@
 <template>
-  <div class="">
-    <AuthForm/>
+  <div>
+    Home Page
   </div>
 </template>
 
 <script setup lang="ts">
-
-definePageMeta({
-  layout: 'auth-layout'
-})
 
 </script>
 
