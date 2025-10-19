@@ -50,7 +50,7 @@
           </FormField>
           <Button
             type="submit"
-            class="bg-fuchsia-600 hover:bg-fuchsia-700 focus-visible:ring-2 focus-visible:ring-fuchsia-900 focus-visible:outline-hidden cursor-pointer transition-colors w-full"
+            class="bg-fuchsia-600 hover:bg-fuchsia-700 focus-visible:ring-2 focus-visible:ring-fuchsia-900 focus-visible:outline-hidden cursor-pointer transition-colors w-full disabled:cursor-wait"
           >
             Log In
           </Button>

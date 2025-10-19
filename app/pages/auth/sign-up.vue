@@ -155,15 +155,20 @@ const handleSingUp = handleSubmit(async ({ email, username, password }) => {
       },
       onSuccess (context) {
         console.log('OnSuccess', context)
-        authClient.sendVerificationEmail({
+        // authClient.sendVerificationEmail({
+        //   email: context.data.user.email,
+        //   callbackURL: '/auth/confirm-account',
+        //   fetchOptions: {
+        //     onError (context) {
+        //       console.log('Error Sending Verifcaition Email', context)
+        //     },
+        //   }
+        // })
+        authClient.emailOtp.sendVerificationOtp({
           email: context.data.user.email,
-          callbackURL: '/auth/confirm-account',
-          fetchOptions: {
-            onError (context) {
-              console.log('Error Sending Verifcaition Email', context)
-            },
-          }
+          type: 'email-verification'
         })
+
         toast.success('Sign-up successful! Please check your Gmail inbox to confirm your account.')
       },
       onError (context) {

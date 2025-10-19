@@ -1,7 +1,8 @@
 import { betterAuth } from 'better-auth'
 import { drizzleAdapter } from 'better-auth/adapters/drizzle'
+import { emailOTP } from 'better-auth/plugins'
 import { db } from './db'
-import { sendEmail } from './email'
+import { sendVerificationEmail, sendVerificationOTPEmail } from './email'
 
 export const auth = betterAuth({
   database: drizzleAdapter(db, {
@@ -12,10 +13,24 @@ export const auth = betterAuth({
   },
   emailVerification: {
     sendVerificationEmail: async ({ url, user }) => {
-      await sendEmail({
+      await sendVerificationEmail({
         email: user.email,
         url,
       })
     }
-  }
+  },
+  plugins: [
+    emailOTP({
+      overrideDefaultEmailVerification: true,
+      async sendVerificationOTP ({ email, otp, type }) {
+        if (type === 'email-verification') {
+          await sendVerificationOTPEmail({
+            email,
+            otp
+          })
+        }
+      },
+      expiresIn: 600
+    })
+  ]
 })

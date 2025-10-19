@@ -9,7 +9,40 @@ const transport = nodemailer.createTransport({
   },
 })
 
-export const sendEmail = async ({ email, url }: { email: string; url: string }) => {
+type SendVerificationOTMEmailParams = { email: string; otp: string }
+
+export const sendVerificationOTPEmail = async ({ email, otp }: SendVerificationOTMEmailParams) => {
+  const confirmUrl = `${process.env.NUXT_BASE_URL}/auth/confirm-account?email=${encodeURIComponent(
+    email
+  )}&otp=${encodeURIComponent(otp)}`
+
+  await transport.sendMail({
+    from: 'UpTask <admin@uptask.com>',
+    to: email,
+    subject: 'UpTask - Verify your account',
+    text: `Your UpTask verification code is: ${otp}\nEnter it at: ${confirmUrl}`,
+    html: `
+    <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
+      <h2 style="color: #a78bfa;">Verify your email</h2>
+      <p>Use the following verification code to confirm your account:</p>
+      <div style="margin: 20px 0; text-align: center;">
+        <span style="font-size: 26px; font-weight: bold; letter-spacing: 4px; color: #a78bfa;">${otp}</span>
+      </div>
+      <p>Once you have your code, go to the following page and enter it:</p>
+      <p style="text-align: center; margin: 16px 0;">
+        <strong><a href="${confirmUrl}" style="color: #a78bfa;">${confirmUrl}</a></strong>
+      </p>
+      <p>This code will expire in 10 minutes.</p>
+      <p style="margin-top: 16px; font-size: 14px; color: #555;">
+        If you didn’t request this email, please ignore it.
+      </p>
+    </div>
+  `,
+  })
+}
+
+type SendVerificationEmailParams = { email: string; url: string }
+export const sendVerificationEmail = async ({ email, url }: SendVerificationEmailParams) => {
   await transport.sendMail({
     from: 'UpTask <admin@uptask.com>',
     to: email,
