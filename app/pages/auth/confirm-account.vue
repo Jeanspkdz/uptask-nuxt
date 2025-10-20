@@ -13,9 +13,9 @@
     <div class="shadow-md bg-white p-4 md:p-8  mt-5  md:mt-10 flex flex-col items-center ">
       <h4 class="text-center mb-4 text-base md:text-2xl font-semibold">6 Digit Code</h4>
 
-      <PinInput v-model="otpCode" placeholder="0" @complete="handleOnComplete">
+      <PinInput v-model="otpCode" placeholder="0" :disabled="isLoading" @complete="handleOnComplete">
         <PinInputGroup>
-          <PinInputSlot v-for="(id, index) in 6" :key="id" :index="index" />
+          <PinInputSlot v-for="(id, index) in 6" :key="id" :index="index" class="focus:ring-fuchsia-500/70"/>
         </PinInputGroup>
       </PinInput>
     </div>
@@ -23,25 +23,43 @@
 </template>
 
 <script setup lang="ts">
-import { authClient } from '~/lib/auth'
-
-const route = useRoute()
-const userEmail = route.query.email?.toString() ?? ''
+import { toast } from 'vue-sonner'
+import { authClient, ERROR_MESSAGES, getErrorMessage } from '~/lib/auth'
 
 definePageMeta({
   layout: 'auth-layout',
 })
 
-const handleOnComplete = async () => {
-  const rawOtp = otpCode.value.join('')
-  console.log(rawOtp)
-  console.log(userEmail)
+const route = useRoute()
+const userEmail = route.query.email?.toString() ?? ''
+const isLoading = ref(false)
 
-  const result = await authClient.emailOtp.verifyEmail({
-    otp: rawOtp,
-    email: userEmail
-  })
-  console.log('ON_COMPLETE', result)
+const handleOnComplete = async () => {
+  try {
+    isLoading.value = true
+    const rawOtp = otpCode.value.join('')
+
+    const { error } = await authClient.emailOtp.verifyEmail({
+      otp: rawOtp,
+      email: userEmail,
+    })
+
+    if (error) {
+      console.log('ERR_CODE', error.code)
+      const errorMessage = getErrorMessage(error.code ?? '')
+      toast.error(errorMessage, {
+        position: 'top-right'
+      })
+      return
+    }
+
+    toast.success('Verification successful!')
+    return await navigateTo('/auth/sign-in')
+  } catch {
+    toast.error(ERROR_MESSAGES['UNKWONN_ERROR'])
+  } finally {
+    isLoading.value = false
+  }
 }
 
 const otpCode = ref<string[]>([])

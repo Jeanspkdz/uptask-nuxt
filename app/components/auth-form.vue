@@ -4,7 +4,7 @@
       <slot name="header"/>
     </header>
 
-    <div class="mx-auto bg-white px-6 py-7 w-full md:max-w-10/12">
+    <div class="mx-auto bg-white px-6 py-7 w-full md:max-w-10/12 shadow-2xl">
       <slot/>
     </div>
 

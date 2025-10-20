@@ -30,7 +30,8 @@ export const auth = betterAuth({
           })
         }
       },
-      expiresIn: 600
+      expiresIn: 600,
+      // sendVerificationOnSignUp: true
     })
   ]
 })
