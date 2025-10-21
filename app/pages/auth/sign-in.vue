@@ -49,6 +49,7 @@
             </FormItem>
           </FormField>
           <Button
+            :disabled="isSubmitting"
             type="submit"
             class="bg-fuchsia-600 hover:bg-fuchsia-700 focus-visible:ring-2 focus-visible:ring-fuchsia-900 focus-visible:outline-hidden cursor-pointer transition-colors w-full disabled:cursor-wait"
           >
@@ -72,7 +73,9 @@
 <script setup lang="ts">
 import { toTypedSchema } from '@vee-validate/zod'
 import { useForm } from 'vee-validate'
+import { toast } from 'vue-sonner'
 import { z } from 'zod'
+import { authClient, ERROR_MESSAGES, getErrorMessage } from '~/lib/auth'
 
 definePageMeta({
   layout: 'auth-layout',
@@ -83,12 +86,31 @@ const loginSchema = z.object({
   password: z.string({ error: 'Password is required' }),
 })
 
-const { handleSubmit } = useForm({
+const { handleSubmit, isSubmitting } = useForm({
   validationSchema: toTypedSchema(loginSchema),
 })
 
-const handleLogin = handleSubmit(data => {
+const handleLogin = handleSubmit(async data => {
   console.log(data)
+  try {
+    const { email, password } = data
+
+    await authClient.signIn.email({
+      email,
+      password,
+      rememberMe: false,
+      fetchOptions: {
+        onError (context) {
+          console.log('ERROR_SING_IN', context)
+          toast.error(getErrorMessage(context.error.code))
+        },
+      },
+      callbackURL: '/'
+    })
+  } catch (error) {
+    toast.error(ERROR_MESSAGES['UNKWONN_ERROR'])
+    console.log(error)
+  }
 })
 </script>
 

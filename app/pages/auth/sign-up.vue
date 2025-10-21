@@ -113,7 +113,7 @@ import { toTypedSchema } from '@vee-validate/zod'
 import { useForm } from 'vee-validate'
 import { toast } from 'vue-sonner'
 import z from 'zod'
-import { authClient } from '~/lib/auth'
+import { authClient, getErrorMessage } from '~/lib/auth'
 
 definePageMeta({
   layout: 'auth-layout',
@@ -155,15 +155,6 @@ const handleSingUp = handleSubmit(async ({ email, username, password }) => {
       },
       onSuccess (context) {
         console.log('OnSuccess', context)
-        // authClient.sendVerificationEmail({
-        //   email: context.data.user.email,
-        //   callbackURL: '/auth/confirm-account',
-        //   fetchOptions: {
-        //     onError (context) {
-        //       console.log('Error Sending Verifcaition Email', context)
-        //     },
-        //   }
-        // })
         authClient.emailOtp.sendVerificationOtp({
           email: context.data.user.email,
           type: 'email-verification'
@@ -173,6 +164,7 @@ const handleSingUp = handleSubmit(async ({ email, username, password }) => {
       },
       onError (context) {
         console.log('OnError', context)
+        toast.error(getErrorMessage(context.error.code))
       },
     }
   )
