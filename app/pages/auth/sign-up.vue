@@ -87,12 +87,9 @@
             </FormItem>
           </FormField>
 
-          <Button
-            :disabled="isSubmitting"
-            type="submit"
-            class="bg-fuchsia-600 hover:bg-fuchsia-700 focus-visible:ring-2 focus-visible:ring-fuchsia-900 focus-visible:outline-hidden cursor-pointer transition-colors w-full"
-            >Register</Button
-          >
+          <Button :disabled="isSubmitting" type="submit" class="w-full">
+            Register
+          </Button>
         </form>
       </template>
 
@@ -157,10 +154,12 @@ const handleSingUp = handleSubmit(async ({ email, username, password }) => {
         console.log('OnSuccess', context)
         authClient.emailOtp.sendVerificationOtp({
           email: context.data.user.email,
-          type: 'email-verification'
+          type: 'email-verification',
         })
 
-        toast.success('Sign-up successful! Please check your Gmail inbox to confirm your account.')
+        toast.success(
+          'Sign-up successful! Please check your Gmail inbox to confirm your account.'
+        )
       },
       onError (context) {
         console.log('OnError', context)
@@ -169,7 +168,6 @@ const handleSingUp = handleSubmit(async ({ email, username, password }) => {
     }
   )
 })
-
 </script>
 
 <style scoped></style>

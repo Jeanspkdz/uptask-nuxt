@@ -7,8 +7,6 @@ export default defineNuxtRouteMiddleware(async (to) => {
 
   if (isPrivateRoute) {
     const userSession = await authClient.useSession(useFetch)
-    console.log(userSession.data.value)
-
     if (!userSession.data.value) {
       return navigateTo('/auth/sign-in')
     }
