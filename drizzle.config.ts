@@ -6,5 +6,5 @@ export default defineConfig({
   out: './server/db/migrations',
   dbCredentials: {
     url: process.env.NUXT_DATABASE_URL || ''
-  }
+  },
 })

@@ -12,6 +12,8 @@ const transport = nodemailer.createTransport({
 type SendVerificationOTMEmailParams = { email: string; otp: string }
 
 export const sendVerificationOTPEmail = async ({ email, otp }: SendVerificationOTMEmailParams) => {
+  console.log('SENDING_VERIFICATION_EMAIL_OTP')
+
   const confirmUrl = `${process.env.NUXT_BASE_URL}/auth/confirm-account?email=${encodeURIComponent(
     email
   )}&otp=${encodeURIComponent(otp)}`
@@ -43,6 +45,8 @@ export const sendVerificationOTPEmail = async ({ email, otp }: SendVerificationO
 
 type SendVerificationEmailParams = { email: string; url: string }
 export const sendVerificationEmail = async ({ email, url }: SendVerificationEmailParams) => {
+  console.log('SENDING_VERIFICATION_EMAIL')
+
   await transport.sendMail({
     from: 'UpTask <admin@uptask.com>',
     to: email,

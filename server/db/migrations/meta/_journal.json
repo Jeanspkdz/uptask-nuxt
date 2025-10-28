@@ -5,15 +5,8 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1760392543973,
-      "tag": "0000_mature_energizer",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "7",
-      "when": 1760455428566,
-      "tag": "0001_burly_kronos",
+      "when": 1761662375603,
+      "tag": "0000_outstanding_earthquake",
       "breakpoints": true
     }
   ]
