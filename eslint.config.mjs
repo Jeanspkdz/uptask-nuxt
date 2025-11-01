@@ -4,5 +4,11 @@ import neostandard from 'neostandard'
 
 export default withNuxt(
   // Your custom configs here
-  ...neostandard()
+  ...neostandard(),
+  {
+    rules: {
+      'no-redeclare': 'off',
+      '@typescript-eslint/no-redeclare': 'off'
+    }
+  }
 )

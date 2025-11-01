@@ -1,0 +1,2 @@
+ALTER TABLE "projects" ALTER COLUMN "name" SET DATA TYPE varchar(50);--> statement-breakpoint
+ALTER TABLE "projects" ADD CONSTRAINT "projects_name_clientName_user_id_unique" UNIQUE("name","clientName","user_id");

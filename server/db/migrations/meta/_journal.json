@@ -8,6 +8,13 @@
       "when": 1761662375603,
       "tag": "0000_outstanding_earthquake",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1761930436333,
+      "tag": "0001_powerful_gwen_stacy",
+      "breakpoints": true
     }
   ]
 }

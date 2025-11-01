@@ -8,12 +8,14 @@ import { timestamps } from './_collums.helpers'
 
 export const project = pgTable('projects', {
   id: t.integer().primaryKey().generatedAlwaysAsIdentity(),
-  name: t.varchar({ length: 256 }).notNull(),
+  name: t.varchar({ length: 50 }).notNull(),
   clientName: t.varchar({ length: 50 }).notNull(),
   description: t.text().notNull(),
   userId: t.text('user_id').references(() => user.id, { onDelete: 'cascade' }).notNull(),
   ...timestamps
-})
+}, (table) => [
+  t.unique().on(table.name, table.clientName, table.userId)
+])
 
 export const projectRelations = relations(project, ({ one, many }) => ({
   author: one(user, {

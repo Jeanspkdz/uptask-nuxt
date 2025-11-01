@@ -1,0 +1,3 @@
+export type PROJECT_ERROR_CODES = {
+  NAME_AND_CLIENT_NAME_ALREADY_EXISTS: string;
+}
