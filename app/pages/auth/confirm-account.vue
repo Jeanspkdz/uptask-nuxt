@@ -24,7 +24,9 @@
 
 <script setup lang="ts">
 import { toast } from 'vue-sonner'
-import { authClient, ERROR_MESSAGES, getErrorMessage } from '~/lib/auth'
+import { GENERIC_ERROR_MESSAGES } from '~/errors'
+import { getAuthErrorMessage } from '~/errors/auth'
+import { authClient } from '~/lib/auth'
 
 definePageMeta({
   layout: 'auth-layout',
@@ -46,7 +48,7 @@ const handleOnComplete = async () => {
 
     if (error) {
       console.log('ERR_CODE', error.code)
-      const errorMessage = getErrorMessage(error.code ?? '')
+      const errorMessage = getAuthErrorMessage(error.code ?? '')
       toast.error(errorMessage, {
         position: 'top-right'
       })
@@ -56,7 +58,7 @@ const handleOnComplete = async () => {
     toast.success('Verification successful!')
     return await navigateTo('/auth/sign-in')
   } catch {
-    toast.error(ERROR_MESSAGES['UNKWONN_ERROR'])
+    toast.error(GENERIC_ERROR_MESSAGES['UNKNOWN'])
   } finally {
     isLoading.value = false
   }

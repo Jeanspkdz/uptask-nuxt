@@ -8,7 +8,7 @@ type ErrorTypes = Partial<
   >
 >
 
-const AUTH_ERROR_CODES = {
+export const AUTH_ERROR_CODES = {
   USER_ALREADY_EXISTS: 'An account with this email already exists',
   USER_ALREADY_EXISTS_USE_ANOTHER_EMAIL: 'This email is already in use',
   INVALID_EMAIL_OR_PASSWORD: 'Invalid email or password',

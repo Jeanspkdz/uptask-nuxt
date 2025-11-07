@@ -75,7 +75,9 @@ import { toTypedSchema } from '@vee-validate/zod'
 import { useForm } from 'vee-validate'
 import { toast } from 'vue-sonner'
 import { z } from 'zod'
-import { authClient, ERROR_MESSAGES, getErrorMessage } from '~/lib/auth'
+import { GENERIC_ERROR_MESSAGES } from '~/errors'
+import { getAuthErrorMessage } from '~/errors/auth'
+import { authClient } from '~/lib/auth'
 
 definePageMeta({
   layout: 'auth-layout',
@@ -102,13 +104,13 @@ const handleLogin = handleSubmit(async data => {
       fetchOptions: {
         onError (context) {
           console.log('ERROR_SING_IN', context)
-          toast.error(getErrorMessage(context.error.code))
+          toast.error(getAuthErrorMessage(context.error.code))
         },
       },
       callbackURL: '/'
     })
   } catch (error) {
-    toast.error(ERROR_MESSAGES['UNKWONN_ERROR'])
+    toast.error(GENERIC_ERROR_MESSAGES['UNKNOWN'])
     console.log(error)
   }
 })

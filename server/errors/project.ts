@@ -10,9 +10,5 @@ export const PROJECT_ERRORS : PROJECT_ERRORS = {
   NAME_AND_CLIENT_NAME_ALREADY_EXISTS: {
     code: 'NAME_AND_CLIENT_NAME_ALREADY_EXISTS',
     message: 'Name and client name already exists'
-  },
-  UNKNOWN_ERROR: {
-    code: 'UNKNOWN_ERROR',
-    message: 'An unknown error occurred'
   }
 }

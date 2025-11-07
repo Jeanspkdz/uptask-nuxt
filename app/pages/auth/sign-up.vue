@@ -110,7 +110,8 @@ import { toTypedSchema } from '@vee-validate/zod'
 import { useForm } from 'vee-validate'
 import { toast } from 'vue-sonner'
 import z from 'zod'
-import { authClient, getErrorMessage } from '~/lib/auth'
+import { getAuthErrorMessage } from '~/errors/auth'
+import { authClient } from '~/lib/auth'
 
 definePageMeta({
   layout: 'auth-layout',
@@ -163,7 +164,7 @@ const handleSingUp = handleSubmit(async ({ email, username, password }) => {
       },
       onError (context) {
         console.log('OnError', context)
-        toast.error(getErrorMessage(context.error.code))
+        toast.error(getAuthErrorMessage(context.error.code))
       },
     }
   )

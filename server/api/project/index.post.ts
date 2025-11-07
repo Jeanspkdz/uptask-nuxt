@@ -16,8 +16,6 @@ export default defineEventHandler(async (event) => {
   // Check if an project with the name and ClientName already exists
   const foundProject = await db.select().from(project).where(and(eq(project.name, data.name), eq(project.clientName, data.clientName)))
 
-  console.log('FOUND', foundProject)
-
   if (foundProject.length > 0) {
     throw createError({
       statusCode: 400,

@@ -101,8 +101,6 @@ const handleCreateProject = handleSubmit(async (data) => {
       method: 'POST',
       body: data,
       onResponse ({ response }) {
-        console.log(response)
-
         if (response.ok) {
           toast.success('Project created successfully!')
           return
