@@ -93,7 +93,6 @@ const { handleSubmit, isSubmitting } = useForm({
 })
 
 const handleLogin = handleSubmit(async data => {
-  console.log(data)
   try {
     const { email, password } = data
 
