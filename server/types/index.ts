@@ -7,3 +7,4 @@ export type SessionInfo = AuthSession['session']
 
 export type Project = InferSelectModel<typeof project>
 export type ProjectInsert = typeof project.$inferInsert
+export type ProjectUpdate = Pick<ProjectInsert, 'clientName' | 'name' | 'description'>

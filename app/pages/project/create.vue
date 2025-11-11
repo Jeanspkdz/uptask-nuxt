@@ -1,5 +1,5 @@
 <template>
-  <div class="px-4 max-w-[440px] mx-auto">
+  <section class="px-4 max-w-[440px] mx-auto">
     <BaseHeading
       title="Create Project"
       subtitle="Fill out the following form to create a project"
@@ -15,8 +15,8 @@
       <FormField v-slot="{ componentField }" name="name">
         <FormItem>
           <FormLabel class="uppercase font-black text-base"
-            >Project Name</FormLabel
-          >
+            >Project Name
+          </FormLabel>
           <FormControl>
             <Input
               placeholder="Input your project name"
@@ -63,7 +63,7 @@
         Create Project
       </Button>
     </form>
-  </div>
+  </section>
 </template>
 
 <script setup lang="ts">
@@ -108,7 +108,7 @@ const handleCreateProject = handleSubmit(async (data) => {
         console.log('CREATE', response)
 
         toast.error(getProjectErrorMessage(response.statusText))
-      }
+      },
     })
   } catch (error) {
     console.log('ERRR', error)
