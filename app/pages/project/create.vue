@@ -4,7 +4,7 @@
       title="Create Project"
       subtitle="Fill out the following form to create a project"
     />
-    <Button as-child variant="soft" class="mt-3">
+    <Button as-child variant="primaryAlt" class="mt-3">
       <NuxtLink to="/"> Go Back to Projects </NuxtLink>
     </Button>
 
@@ -105,6 +105,8 @@ const handleCreateProject = handleSubmit(async (data) => {
           toast.success('Project created successfully!')
           return
         }
+        console.log('CREATE', response)
+
         toast.error(getProjectErrorMessage(response.statusText))
       }
     })

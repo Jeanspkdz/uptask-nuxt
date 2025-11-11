@@ -8,7 +8,7 @@
         </button>
       </div>
     </header>
-    <main class="h-full py-7 bg-gray-100/80 flex-1">
+    <main class="py-7 bg-gray-100/80 flex-1 min-h-full flex">
       <slot />
     </main>
   </div>

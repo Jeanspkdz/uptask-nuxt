@@ -1,14 +1,15 @@
 import { and, eq } from 'drizzle-orm'
 import { project } from '~~/server/db/schema/project'
+import { GENERIC_ERROR_MESSAGES } from '~~/server/errors'
 import { PROJECT_ERRORS } from '~~/server/errors/project'
-import type { AuthUser, ProjectInsert } from '~~/server/types'
+import type { User, ProjectInsert } from '~~/server/types'
 
 export default defineEventHandler(async (event) => {
-  const userAuthenticated: AuthUser = event.context.auth
+  const userAuthenticated: User = event.context.auth
   if (!userAuthenticated) {
-    return createError({
+    throw createError({
       statusCode: 401,
-      statusMessage: 'User must be authenticated to perform this action.',
+      statusMessage: GENERIC_ERROR_MESSAGES['UNAUTHORIZED']['code']
     })
   }
   const data = (await readBody(event)) as ProjectInsert

@@ -1,6 +1,7 @@
 import { eq } from 'drizzle-orm'
 import { user } from '~~/server/db/schema/auth-schema'
 import { project } from '~~/server/db/schema/project'
+import { GENERIC_ERROR_MESSAGES } from '~~/server/errors'
 import type { User } from '~~/server/types'
 
 export default defineEventHandler(async (event) => {
@@ -8,7 +9,7 @@ export default defineEventHandler(async (event) => {
   if (!userAuthenticated) {
     return createError({
       statusCode: 401,
-      statusMessage: 'User must be authenticated to perform this action.',
+      statusMessage: GENERIC_ERROR_MESSAGES['UNAUTHORIZED']['code']
     })
   }
 
