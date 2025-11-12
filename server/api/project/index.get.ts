@@ -1,7 +1,7 @@
 import { eq } from 'drizzle-orm'
 import { user } from '~~/server/db/schema/auth-schema'
 import { project } from '~~/server/db/schema/project'
-import { GENERIC_ERROR_MESSAGES } from '~~/server/errors'
+import { GENERIC_ERRORS } from '~~/server/errors'
 import type { User } from '~~/server/types'
 
 export default defineEventHandler(async (event) => {
@@ -9,7 +9,7 @@ export default defineEventHandler(async (event) => {
   if (!userAuthenticated) {
     return createError({
       statusCode: 401,
-      statusMessage: GENERIC_ERROR_MESSAGES['UNAUTHORIZED']['code']
+      statusMessage: GENERIC_ERRORS['UNAUTHORIZED']['code']
     })
   }
 

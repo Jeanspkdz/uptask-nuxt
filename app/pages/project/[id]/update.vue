@@ -66,7 +66,11 @@
           </FormItem>
         </FormField>
 
-        <Button :disabled="isSubmitting || !meta.dirty" type="submit" class="uppercase w-full">
+        <Button
+          :disabled="isSubmitting || !meta.dirty"
+          type="submit"
+          class="uppercase w-full"
+        >
           Update Project
         </Button>
       </form>
@@ -80,7 +84,11 @@ import { useForm } from 'vee-validate'
 import { toast } from 'vue-sonner'
 import z from 'zod'
 import FormItem from '~/components/ui/form/FormItem.vue'
-import { getGenericErrorMessage, type GenericErrorKey } from '~/errors'
+import {
+  getErrorMessage,
+  type GenericErrorKey
+} from '~/errors'
+import type { ErrorData } from '~~/server/errors'
 import type { Project } from '~~/server/types'
 
 definePageMeta({
@@ -117,30 +125,27 @@ const handleUpdateProject = handleSubmit(async (values, actions) => {
     await $fetch(`/api/project/${id}`, {
       method: 'PUT',
       body: {
-        ...values
+        ...values,
       },
       ignoreResponseError: true,
       onResponse ({ response }) {
         if (response.ok) {
           toast.success('Project updated successfully!!')
+          actions.resetForm({
+            values,
+          })
           return
         }
-        toast.error('LaLALALA')
-      }
-    })
-
-    actions.resetForm({
-      values
+        const errorData = response._data.data as ErrorData
+        toast.error(getErrorMessage(errorData.scope, errorData.code))
+      },
     })
   } catch (error) {
     console.log('ERR_UPDATE_PROJECT', error)
-    toast.error(getGenericErrorMessage('UNKNOWN'))
+    toast.error(getErrorMessage('GENERIC', 'UNKNOWN'))
   }
 })
 
-watchEffect(() => {
-  console.log('META', meta)
-})
 </script>
 
 <style scoped></style>

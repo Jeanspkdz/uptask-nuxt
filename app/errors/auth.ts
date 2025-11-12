@@ -8,7 +8,7 @@ type ErrorTypes = Partial<
   >
 >
 
-export const AUTH_ERROR_CODES = {
+export const AUTH_ERROR_MESSAGES = {
   USER_ALREADY_EXISTS: 'An account with this email already exists',
   USER_ALREADY_EXISTS_USE_ANOTHER_EMAIL: 'This email is already in use',
   INVALID_EMAIL_OR_PASSWORD: 'Invalid email or password',
@@ -18,8 +18,8 @@ export const AUTH_ERROR_CODES = {
 } satisfies ErrorTypes
 
 export const getAuthErrorMessage = (code: string) => {
-  if (code in AUTH_ERROR_CODES) {
-    return AUTH_ERROR_CODES[code as keyof typeof AUTH_ERROR_CODES]
+  if (code in AUTH_ERROR_MESSAGES) {
+    return AUTH_ERROR_MESSAGES[code as keyof typeof AUTH_ERROR_MESSAGES]
   }
   return GENERIC_ERROR_MESSAGES['UNKNOWN']
 }

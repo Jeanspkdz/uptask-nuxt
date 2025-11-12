@@ -1,17 +1,17 @@
-import type { GenericErrorCodes } from '#shared/types/error'
+import type { ErrorCodes, ErrorScopes, GenericErrorCodes } from '#shared/types/error'
 
-type GenericErrorMessages = {
-  [K in keyof GenericErrorCodes]: GenericErrorCodesValue<K>
-}
-
-export type GenericErrorCodesValue<T extends string = string> = {
+export type ErrorDetails<T extends string = string> = {
   code: T,
   message: string
 }
 
-export type ErrorData = GenericErrorCodesValue & { reason: string }
+export type ErrorData = ErrorDetails<ErrorCodes> & { reason: string, scope: ErrorScopes }
 
-export const GENERIC_ERROR_MESSAGES: GenericErrorMessages = {
+type GenericErrorDef = {
+  [K in GenericErrorCodes]: ErrorDetails<K>
+}
+
+export const GENERIC_ERRORS = {
   FORBIDDEN: {
     code: 'FORBIDDEN',
     message: "You don't have permission to perform this action",
@@ -32,4 +32,4 @@ export const GENERIC_ERROR_MESSAGES: GenericErrorMessages = {
     code: 'NOT_FOUND',
     message: 'The requested resource could not be found'
   }
-} satisfies GenericErrorMessages
+} satisfies GenericErrorDef

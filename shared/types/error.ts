@@ -1,11 +1,16 @@
-export type ProjectErrorCodes = {
-  NAME_AND_CLIENT_NAME_ALREADY_EXISTS: string;
-}
+export type ErrorScopes = 'AUTH' | 'PROJECT' | 'GENERIC'
 
-export type GenericErrorCodes = {
-  UNKNOWN: string;
-  UNAUTHORIZED: string;
-  FORBIDDEN: string;
-  BAD_REQUEST: string;
-  NOT_FOUND: string;
-}
+export type ProjectErrorCodes =
+  | 'NAME_AND_CLIENT_NAME_ALREADY_EXISTS'
+
+export type GenericErrorCodes =
+  | 'UNKNOWN'
+  | 'UNAUTHORIZED'
+  | 'FORBIDDEN'
+  | 'BAD_REQUEST'
+  | 'NOT_FOUND'
+
+export type ErrorCodes = ProjectErrorCodes | GenericErrorCodes
+
+// export type AuthErrorCodes =
+//   | 'FORBIDDEN'

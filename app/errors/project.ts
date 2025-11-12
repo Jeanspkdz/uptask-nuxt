@@ -1,9 +1,9 @@
 import type { ProjectErrorCodes } from '#shared/types/error'
 import { GENERIC_ERROR_MESSAGES } from '.'
 
-const PROJECT_ERROR_MESSAGES = {
+export const PROJECT_ERROR_MESSAGES = {
   NAME_AND_CLIENT_NAME_ALREADY_EXISTS: 'A project with this name already exists for the client',
-} satisfies ProjectErrorCodes
+} satisfies Record<ProjectErrorCodes, string>
 
 export const getProjectErrorMessage = (code: string) => {
   if (code in PROJECT_ERROR_MESSAGES) {

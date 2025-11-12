@@ -1,7 +1,7 @@
 import { eq } from 'drizzle-orm'
 import { project } from '~~/server/db/schema/project'
 import type { ErrorData } from '~~/server/errors'
-import { GENERIC_ERROR_MESSAGES } from '~~/server/errors'
+import { GENERIC_ERRORS } from '~~/server/errors'
 import type { User } from '~~/server/types'
 
 export default defineEventHandler(async (event) => {
@@ -9,7 +9,7 @@ export default defineEventHandler(async (event) => {
   if (!userAuthenticated) {
     throw createError({
       statusCode: 401,
-      statusMessage: GENERIC_ERROR_MESSAGES['UNAUTHORIZED']['code'],
+      statusMessage: GENERIC_ERRORS['UNAUTHORIZED']['code'],
     })
   }
 
@@ -18,10 +18,11 @@ export default defineEventHandler(async (event) => {
   if (!id) {
     throw createError<ErrorData>({
       statusCode: 400,
-      statusMessage: GENERIC_ERROR_MESSAGES['BAD_REQUEST']['code'],
+      statusMessage: GENERIC_ERRORS['BAD_REQUEST']['code'],
       data: {
-        ...GENERIC_ERROR_MESSAGES['BAD_REQUEST'],
-        reason: 'Missing required parameter'
+        ...GENERIC_ERRORS['BAD_REQUEST'],
+        reason: 'Missing required parameter',
+        scope: 'GENERIC'
       }
     })
   }
@@ -30,10 +31,11 @@ export default defineEventHandler(async (event) => {
   if (isNaN(numericId)) {
     throw createError<ErrorData>({
       statusCode: 400,
-      statusMessage: GENERIC_ERROR_MESSAGES['BAD_REQUEST']['code'],
+      statusMessage: GENERIC_ERRORS['BAD_REQUEST']['code'],
       data: {
-        ...GENERIC_ERROR_MESSAGES['BAD_REQUEST'],
-        reason: 'Project ID must be a number'
+        ...GENERIC_ERRORS['BAD_REQUEST'],
+        reason: 'Project ID must be a number',
+        scope: 'GENERIC'
       }
     })
   }
@@ -43,10 +45,11 @@ export default defineEventHandler(async (event) => {
   if (projectFound.length === 0) {
     throw createError<ErrorData>({
       statusCode: 404,
-      statusMessage: GENERIC_ERROR_MESSAGES['NOT_FOUND']['code'],
+      statusMessage: GENERIC_ERRORS['NOT_FOUND']['code'],
       data: {
-        ...GENERIC_ERROR_MESSAGES['NOT_FOUND'],
-        reason: 'The requested project could not be found in the database'
+        ...GENERIC_ERRORS['NOT_FOUND'],
+        reason: 'The requested project could not be found in the database',
+        scope: 'GENERIC'
       }
     })
   }

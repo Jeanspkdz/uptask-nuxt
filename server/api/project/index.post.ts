@@ -1,6 +1,6 @@
 import { and, eq } from 'drizzle-orm'
 import { project } from '~~/server/db/schema/project'
-import { GENERIC_ERROR_MESSAGES } from '~~/server/errors'
+import { GENERIC_ERRORS } from '~~/server/errors'
 import { PROJECT_ERRORS } from '~~/server/errors/project'
 import type { User, ProjectInsert } from '~~/server/types'
 
@@ -9,7 +9,7 @@ export default defineEventHandler(async (event) => {
   if (!userAuthenticated) {
     throw createError({
       statusCode: 401,
-      statusMessage: GENERIC_ERROR_MESSAGES['UNAUTHORIZED']['code']
+      statusMessage: GENERIC_ERRORS['UNAUTHORIZED']['code']
     })
   }
   const data = (await readBody(event)) as ProjectInsert
