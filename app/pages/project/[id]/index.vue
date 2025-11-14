@@ -20,7 +20,7 @@
       <div class="mt-8">
         <h3 class="text-3xl font-black">Tasks</h3>
 
-        <div>Your tasks</div>
+        <TaskBoard class="mt-4"/>
       </div>
     </div>
   </section>
@@ -37,9 +37,6 @@ definePageMeta({
 const route = useRoute()
 const id = route.params.id
 const { data, error } = await useFetch<Project>(`/api/project/${id}`)
-console.log({
-  error: error.value,
-})
 </script>
 
 <style scoped></style>
