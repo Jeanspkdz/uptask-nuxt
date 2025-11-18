@@ -7,7 +7,7 @@ import { timestamps } from './_collums.helpers'
 
 export const collaborator = pgTable('collaborators', {
   userId: t.text('user_id').notNull().references(() => user.id, { onDelete: 'cascade' }),
-  projectId: t.integer('project_id').notNull().references(() => project.id, { onDelete: 'cascade' }),
+  projectId: t.text('project_id').notNull().references(() => project.id, { onDelete: 'cascade' }),
   ...timestamps
 }, (table) => [
   t.primaryKey({ columns: [table.projectId, table.userId] })

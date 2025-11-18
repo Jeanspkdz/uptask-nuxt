@@ -5,9 +5,10 @@ import { pgTable } from 'drizzle-orm/pg-core'
 import { projectTask } from './project-task'
 import { collaborator } from './collaborator'
 import { timestamps } from './_collums.helpers'
+import { createId } from '@paralleldrive/cuid2'
 
 export const project = pgTable('projects', {
-  id: t.integer().primaryKey().generatedAlwaysAsIdentity(),
+  id: t.text().primaryKey().$defaultFn(() => createId()),
   name: t.varchar({ length: 50 }).notNull(),
   clientName: t.varchar({ length: 50 }).notNull(),
   description: t.text().notNull(),

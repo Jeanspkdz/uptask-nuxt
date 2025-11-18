@@ -15,6 +15,13 @@
       "when": 1761930436333,
       "tag": "0001_powerful_gwen_stacy",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1763494006202,
+      "tag": "0002_cultured_zarek",
+      "breakpoints": true
     }
   ]
 }

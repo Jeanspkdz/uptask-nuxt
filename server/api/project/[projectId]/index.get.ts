@@ -27,20 +27,7 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  const numericId = Number(id)
-  if (isNaN(numericId)) {
-    throw createError<ErrorData>({
-      statusCode: 400,
-      statusMessage: GENERIC_ERRORS['BAD_REQUEST']['code'],
-      data: {
-        ...GENERIC_ERRORS['BAD_REQUEST'],
-        reason: 'Project ID must be a number',
-        scope: 'GENERIC'
-      }
-    })
-  }
-
-  const projectFound = await db.select().from(project).where(eq(project.id, numericId))
+  const projectFound = await db.select().from(project).where(eq(project.id, id))
 
   if (projectFound.length === 0) {
     throw createError<ErrorData>({

@@ -3,6 +3,7 @@ import * as t from 'drizzle-orm/pg-core'
 import { pgEnum, pgTable } from 'drizzle-orm/pg-core'
 import { project } from './project'
 import { timestamps } from './_collums.helpers'
+import { createId } from '@paralleldrive/cuid2'
 
 export const taskState = pgEnum('task_states', [
   'pending',
@@ -13,11 +14,11 @@ export const taskState = pgEnum('task_states', [
 ])
 
 export const projectTask = pgTable('project_tasks', {
-  id: t.integer().generatedAlwaysAsIdentity().primaryKey(),
+  id: t.text().primaryKey().$defaultFn(() => createId()),
   name: t.varchar({ length: 50 }).notNull(),
   description: t.text().notNull(),
   state: taskState().default('pending'),
-  projectId: t.integer('project_id').references(() => project.id, { onDelete: 'cascade' }),
+  projectId: t.text('project_id').references(() => project.id, { onDelete: 'cascade' }),
   ...timestamps
 })
 
