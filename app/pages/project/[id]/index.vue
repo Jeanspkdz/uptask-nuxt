@@ -13,14 +13,15 @@
       />
 
       <div class="space-x-2 mt-2.5">
-        <Button variant="primaryAlt" class="px-6"> Add Task </Button>
+
+        <TaskAddButton />
         <Button class="px-6"> Collaborator </Button>
       </div>
 
       <div class="mt-8">
         <h3 class="text-3xl font-black">Tasks</h3>
 
-        <TaskBoard class="mt-4"/>
+        <TaskBoard class="mt-4" />
       </div>
     </div>
   </section>
@@ -37,6 +38,7 @@ definePageMeta({
 const route = useRoute()
 const id = route.params.id
 const { data, error } = await useFetch<Project>(`/api/project/${id}`)
+
 </script>
 
 <style scoped></style>

@@ -14,7 +14,7 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  const id = getRouterParam(event, 'id')
+  const id = getRouterParam(event, 'projectId')
 
   if (!id) {
     throw createError<ErrorData>({
