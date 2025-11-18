@@ -92,9 +92,14 @@ const createProjectSchema = z.object({
 
 const { isSubmitting, handleSubmit } = useForm({
   validationSchema: toTypedSchema(createProjectSchema),
+  initialValues: {
+    name: '',
+    clientName: '',
+    description: ''
+  }
 })
 
-const handleCreateProject = handleSubmit(async (data) => {
+const handleCreateProject = handleSubmit(async (data, actions) => {
   try {
     await $fetch('/api/project', {
       ignoreResponseError: true,
@@ -103,10 +108,9 @@ const handleCreateProject = handleSubmit(async (data) => {
       onResponse ({ response }) {
         if (response.ok) {
           toast.success('Project created successfully!')
+          actions.resetForm()
           return
         }
-        console.log('CREATE', response)
-
         toast.error(getProjectErrorMessage(response.statusText))
       },
     })

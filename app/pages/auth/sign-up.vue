@@ -138,9 +138,15 @@ const signUpSchema = z
 
 const { handleSubmit, isSubmitting } = useForm({
   validationSchema: toTypedSchema(signUpSchema),
+  initialValues: {
+    username: '',
+    email: '',
+    password: '',
+    confirmPassword: ''
+  }
 })
 
-const handleSingUp = handleSubmit(async ({ email, username, password }) => {
+const handleSingUp = handleSubmit(async ({ email, username, password }, actions) => {
   await authClient.signUp.email(
     {
       email,
@@ -157,6 +163,8 @@ const handleSingUp = handleSubmit(async ({ email, username, password }) => {
           email: context.data.user.email,
           type: 'email-verification',
         })
+
+        actions.resetForm()
 
         toast.success(
           'Sign-up successful! Please check your Gmail inbox to confirm your account.'
