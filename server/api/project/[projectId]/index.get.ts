@@ -1,5 +1,5 @@
 import { eq } from 'drizzle-orm'
-import { project } from '~~/server/db/schema/project'
+import { projectTable } from '~~/server/db/schema/project'
 import type { ErrorData } from '~~/server/errors'
 import { GENERIC_ERRORS } from '~~/server/errors'
 import type { User } from '~~/server/types'
@@ -27,7 +27,7 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  const projectFound = await db.select().from(project).where(eq(project.id, id))
+  const projectFound = await db.select().from(projectTable).where(eq(projectTable.id, id))
 
   if (projectFound.length === 0) {
     throw createError<ErrorData>({

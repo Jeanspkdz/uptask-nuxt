@@ -15,6 +15,7 @@
 
 <script setup lang="ts">
 export type TaskState = 'pending' | 'waiting' | 'in_progress' | 'in_review' | 'completed'
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const props = defineProps<{
   heading: string;
   variant: TaskState

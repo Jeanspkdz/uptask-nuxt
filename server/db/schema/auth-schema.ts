@@ -1,7 +1,7 @@
 import { relations } from 'drizzle-orm'
 import { pgTable, text, timestamp, boolean } from 'drizzle-orm/pg-core'
 import { collaborator } from './collaborator'
-import { project } from './project'
+import { projectTable } from './project'
 
 export const user = pgTable('users', {
   id: text('id').primaryKey(),
@@ -16,7 +16,7 @@ export const user = pgTable('users', {
     .notNull(),
 })
 export const userRelations = relations(user, ({ many, }) => ({
-  project: many(project),
+  project: many(projectTable),
   collaborator: many(collaborator),
 }))
 

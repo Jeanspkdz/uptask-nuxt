@@ -1,5 +1,5 @@
 import { and, eq } from 'drizzle-orm'
-import { project } from '~~/server/db/schema/project'
+import { projectTable } from '~~/server/db/schema/project'
 import { GENERIC_ERRORS } from '~~/server/errors'
 import { PROJECT_ERRORS } from '~~/server/errors/project'
 import type { User, ProjectInsert } from '~~/server/types'
@@ -15,7 +15,7 @@ export default defineEventHandler(async (event) => {
   const data = (await readBody(event)) as ProjectInsert
 
   // Check if an project with the name and ClientName already exists
-  const foundProject = await db.select().from(project).where(and(eq(project.name, data.name), eq(project.clientName, data.clientName)))
+  const foundProject = await db.select().from(projectTable).where(and(eq(projectTable.name, data.name), eq(projectTable.clientName, data.clientName)))
 
   if (foundProject.length > 0) {
     throw createError({
@@ -28,7 +28,7 @@ export default defineEventHandler(async (event) => {
   }
 
   const projectInserted = await db
-    .insert(project)
+    .insert(projectTable)
     .values({
       clientName: data.clientName,
       name: data.name,

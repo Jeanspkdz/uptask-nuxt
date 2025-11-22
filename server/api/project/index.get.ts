@@ -1,6 +1,6 @@
 import { eq } from 'drizzle-orm'
 import { user } from '~~/server/db/schema/auth-schema'
-import { project } from '~~/server/db/schema/project'
+import { projectTable } from '~~/server/db/schema/project'
 import { GENERIC_ERRORS } from '~~/server/errors'
 import type { User } from '~~/server/types'
 
@@ -13,7 +13,7 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  const proyectsByUser = await db.select().from(project).innerJoin(user, eq(project.userId, user.id))
+  const proyectsByUser = await db.select().from(projectTable).innerJoin(user, eq(projectTable.userId, user.id))
   // db.select().from(project).where(eq(project.userId, userAuthenticated.id))
 
   return proyectsByUser

@@ -21,6 +21,7 @@
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "drizzle-orm": "^0.44.6",
+    "drizzle-zod": "^0.8.3",
     "eslint": "^9.36.0",
     "lucide-vue-next": "^0.544.0",
     "nodemailer": "^7.0.9",

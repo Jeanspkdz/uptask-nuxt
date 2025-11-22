@@ -8,22 +8,33 @@
       <TaskBoardColumnHeader heading="Completed" variant="completed" />
     </div>
 
-    <div class="flex *:flex-1 gap-x-4 ">
+    <div class="flex *:flex-1 gap-x-4">
       <template v-for="(_, key) in tasksByState" :key="key">
-        <VueDraggable
-          ref="pending-tasks"
-          v-model="tasksByState[key]"
-          class="bg-slate-200"
-          group="tasks"
-          force-fallback
-          :animation="150"
-          :data-task-state="key"
-          @end="onEnd!"
-        >
-          <div v-for="item in tasksByState[key]" :key="item.id">
-            {{ item.title }} - {{ item.state }}
-          </div>
-        </VueDraggable>
+        <template v-if="tasksByState[key].length > 0">
+          <VueDraggable
+            ref="pending-tasks"
+            v-model="tasksByState[key]"
+            class="flex flex-col gap-4"
+            group="tasks"
+            handle="[data-draggable]"
+            force-fallback
+            :animation="150"
+            :data-task-state="key"
+            @end="onEnd!"
+          >
+            <TaskCard
+              v-for="item in tasksByState[key]"
+              :key="item.id"
+              :name="item.name"
+              :description="item.description"
+            />
+          </VueDraggable>
+        </template>
+        <div v-else class="mt-4">
+          <p class="capitalize font-bold text-black/35 text-sm text-center">
+            No hay tareas
+          </p>
+        </div>
       </template>
     </div>
   </div>
@@ -33,75 +44,33 @@
 import {
   VueDraggable,
   type DraggableEvent,
-  type UseDraggableReturn
+  type UseDraggableReturn,
 } from 'vue-draggable-plus'
 import type { TaskState } from './column-header.vue'
 
-type Task = { id: string; title: string; state: TaskState; order: number }
-const tasks: Task[] = [
+const route = useRoute()
+const projectId = route.params.id
+const { data: tasks, error } = await useFetch(
+  `/api/project/${projectId}/task`,
   {
-    id: 'tsk_a1f9',
-    title: 'Design login screen',
-    state: 'pending',
-    order: 1,
-  },
-  { id: 'tsk_b2d7', title: 'Create wireframes', state: 'pending', order: 2 },
-  { id: 'tsk_b2dc', title: 'Learn wordpress', state: 'pending', order: 3 },
-
-  {
-    id: 'tsk_c8e4',
-    title: 'Client feedback on mockups',
-    state: 'waiting',
-    order: 1,
-  },
-  { id: 'tsk_d3a5', title: 'Confirm API specs', state: 'waiting', order: 2 },
-
-  {
-    id: 'tsk_e9b2',
-    title: 'Implement authentication',
-    state: 'in_progress',
-    order: 1,
-  },
-  {
-    id: 'tsk_f4c1',
-    title: 'Integrate payment gateway',
-    state: 'in_progress',
-    order: 2,
-  },
-
-  {
-    id: 'tsk_g7d8',
-    title: 'Review user dashboard',
-    state: 'in_review',
-    order: 1,
-  },
-  {
-    id: 'tsk_h5e3',
-    title: 'Test mobile responsiveness',
-    state: 'in_review',
-    order: 2,
-  },
-
-  {
-    id: 'tsk_i6f0',
-    title: 'Set up database schema',
-    state: 'completed',
-    order: 1,
-  },
-  {
-    id: 'tsk_j2a9',
-    title: 'Deploy to production',
-    state: 'completed',
-    order: 2,
-  },
-]
-const tasksRef = ref(tasks)
-
-const tasksGroupedByStatus = ref(
-  Object.groupBy(tasksRef.value, (task) => task.state)
+    transform: (tasks) => {
+      return tasks.map((task) => ({
+        id: task.id,
+        name: task.name,
+        state: task.state,
+        order: task.order,
+        description: task.description,
+      }))
+    },
+  }
 )
 
-const tasksByState = ref({
+const tasksGroupedByStatus = computed(() => {
+  if (!tasks.value) return {}
+  return Object.groupBy(tasks.value, (task) => task.state)
+})
+
+const tasksByState = reactive({
   // or reactive
   pending: tasksGroupedByStatus.value.pending || [],
   waiting: tasksGroupedByStatus.value.waiting || [],
@@ -112,8 +81,7 @@ const tasksByState = ref({
 
 const taskBoardRef = useTemplateRef<UseDraggableReturn>('pending-tasks')
 
-const onEnd = (e: DraggableEvent) => {
-  console.log('onEnd', e)
+const onEnd = async (e: DraggableEvent) => {
   const fromState = e.from.dataset.taskState
   const toState = e.to.dataset.taskState as TaskState
 
@@ -121,13 +89,29 @@ const onEnd = (e: DraggableEvent) => {
   const toIndex = e.newDraggableIndex
 
   if (fromState === toState && fromIndex === toIndex) {
-    console.log('NO ME MOVI')
     return
   }
-  tasksByState.value[toState].map((task, index) => {
+
+  tasksByState[toState].map((task, index) => {
     task.state = toState
     task.order = index + 1 // The order is the reflection of its current position
     return task
+  })
+
+  // Call API to update all tasks in toState
+  const { data, error } = await useFetch(
+    '/api/project/:projectId/task/reorder',
+    {
+      method: 'PUT',
+      body: tasksByState[toState],
+    }
+  )
+
+  console.log({
+    reorder: {
+      tasks: data.value,
+      error: error.value,
+    },
   })
 }
 
@@ -135,10 +119,10 @@ watch(
   tasksByState,
   () => {
     console.log({
-      tasksByState: tasksByState.value,
+      tasksByState,
     })
   },
-  { immediate: true, deep: true }
+  { immediate: true }
 )
 </script>
 
