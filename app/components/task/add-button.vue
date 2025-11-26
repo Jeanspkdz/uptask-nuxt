@@ -48,6 +48,11 @@ import { toTypedSchema } from '@vee-validate/zod'
 import { toast } from 'vue-sonner'
 import { getErrorMessage } from '~/errors'
 import type { ErrorData } from '~~/server/errors'
+import type { Task } from '~~/server/types'
+
+const emit = defineEmits<{
+  taskCreated: [task: Task]
+}>()
 
 const route = useRoute()
 const projectId = route.params.id
@@ -80,6 +85,9 @@ const handleAddNewTask = (closeDialog: () => void) => {
             toast.success('Task Created Successfully!!')
             actions.resetForm()
             closeDialog()
+            console.log('succes', response)
+
+            emit('taskCreated', response._data)
             return
           }
           const errorData = response._data.data as ErrorData
@@ -87,7 +95,7 @@ const handleAddNewTask = (closeDialog: () => void) => {
         }
       })
     } catch {
-
+      toast.error(getErrorMessage('GENERIC', 'UNKNOWN'))
     }
   })
 }

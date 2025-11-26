@@ -36,6 +36,7 @@ const { errorCode } = defineProps<{
 onMounted(() => {
   toast.error(getGenericErrorMessage(errorCode))
 })
+
 </script>
 
 <style scoped>

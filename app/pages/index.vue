@@ -9,11 +9,11 @@
     </Button>
 
     <div v-if="data && data?.length > 0" class="space-y-4 mt-6">
-      <RouterLink
+      <NuxtLink
         v-for="{ projects: project } in data"
         :key="project.id"
         class="block"
-        :to="`project/${project.id}`"
+        :to="`/project/${project.id}`"
       >
         <ProjectCard
           :id="project.id"
@@ -22,7 +22,7 @@
           :description="project.description"
           :role="getUserRoleForProject(project.userId)"
         />
-      </RouterLink>
+      </NuxtLink>
     </div>
   </div>
 </template>

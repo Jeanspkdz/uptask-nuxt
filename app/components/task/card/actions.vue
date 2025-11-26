@@ -1,7 +1,7 @@
 <template>
   <DropdownMenu data-not-draggable>
     <DropdownMenuTrigger as-child>
-      <Button variant="ghost" class="">
+      <Button variant="ghost">
         <EllipsisVertical class="size-[20px]"/>
       </Button>
     </DropdownMenuTrigger>

@@ -21,7 +21,7 @@
           <p class="text-zinc-400 text-sm font-bold">{{ description }}</p>
         </div>
 
-        <ProjectCardActions :id="id" />
+        <ProjectCardActions :project-id="id" />
       </div>
     </article>
 </template>

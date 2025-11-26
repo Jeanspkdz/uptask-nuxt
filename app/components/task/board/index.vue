@@ -1,85 +1,104 @@
 <template>
-  <div>
-    <div class="flex *:flex-1 gap-x-4">
-      <TaskBoardColumnHeader heading="Pending" variant="pending" />
-      <TaskBoardColumnHeader heading="Waiting" variant="waiting" />
-      <TaskBoardColumnHeader heading="In Progress" variant="in_progress" />
-      <TaskBoardColumnHeader heading="In Review" variant="in_review" />
-      <TaskBoardColumnHeader heading="Completed" variant="completed" />
-    </div>
+  <div class="flex gap-x-4 overflow-x-auto max-w-full">
+    <div
+      v-for="(val, key) in tasksByState"
+      :key="key"
+      class="min-w-full flex-1 md:min-w-auto"
+    >
+      <TaskBoardColumnHeader
+        :heading="val.label"
+        :variant="val.variant"
+        class=""
+      />
 
-    <div class="flex *:flex-1 gap-x-4">
-      <template v-for="(_, key) in tasksByState" :key="key">
-        <template v-if="tasksByState[key].length > 0">
-          <VueDraggable
-            ref="pending-tasks"
-            v-model="tasksByState[key]"
-            class="flex flex-col gap-4"
-            group="tasks"
-            handle="[data-draggable]"
-            force-fallback
-            :animation="150"
-            :data-task-state="key"
-            @end="onEnd!"
+      <div class="relative">
+        <VueDraggable
+          ref="pending-tasks"
+          v-model="val.tasks"
+          class="flex flex-col gap-4 min-h-32"
+          :group="{
+            name: 'tasks',
+          }"
+          handle="[data-draggable]"
+          :animation="150"
+          :data-task-state="key"
+          :scroll="true"
+          :bubble-scroll="true"
+          :force-fallback="true"
+          :scroll-sensitivity="50"
+          :scroll-speed="50"
+          @end="onEnd!"
+        >
+          <TaskCard
+            v-for="item in val.tasks"
+            :key="item.id"
+            :name="item.name"
+            :description="item.description"
+            class="select-none"
+          />
+        </VueDraggable>
+
+        <div v-if="val.tasks.length == 0" class="absolute top-0 w-full mt-4">
+          <p
+            class="pointer-events-none capitalize font-bold text-black/35 text-sm text-center"
           >
-            <TaskCard
-              v-for="item in tasksByState[key]"
-              :key="item.id"
-              :name="item.name"
-              :description="item.description"
-            />
-          </VueDraggable>
-        </template>
-        <div v-else class="mt-4">
-          <p class="capitalize font-bold text-black/35 text-sm text-center">
-            No hay tareas
+            No tasks yet
           </p>
         </div>
-      </template>
+      </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import {
-  VueDraggable,
-  type DraggableEvent,
-  type UseDraggableReturn,
-} from 'vue-draggable-plus'
+import { VueDraggable, type DraggableEvent } from 'vue-draggable-plus'
+import type { Task } from '~~/server/types'
 import type { TaskState } from './column-header.vue'
+
+type TaskPayload = Pick<
+  Task,
+  'id' | 'name' | 'order' | 'state' | 'description'
+>
 
 const route = useRoute()
 const projectId = route.params.id
-const { data: tasks, error } = await useFetch(
-  `/api/project/${projectId}/task`,
-  {
-    transform: (tasks) => {
-      return tasks.map((task) => ({
-        id: task.id,
-        name: task.name,
-        state: task.state,
-        order: task.order,
-        description: task.description,
-      }))
-    },
-  }
-)
+
+const { tasks = [] } = defineProps<{
+  tasks?: TaskPayload[];
+}>()
 
 const tasksGroupedByStatus = computed(() => {
-  if (!tasks.value) return {}
-  return Object.groupBy(tasks.value, (task) => task.state)
+  if (!tasks) return {}
+  return Object.groupBy(tasks, (task) => task.state)
 })
 
 const tasksByState = reactive({
-  // or reactive
-  pending: tasksGroupedByStatus.value.pending || [],
-  waiting: tasksGroupedByStatus.value.waiting || [],
-  in_progress: tasksGroupedByStatus.value.in_progress || [],
-  in_review: tasksGroupedByStatus.value.in_review || [],
-  completed: tasksGroupedByStatus.value.completed || [],
+  pending: {
+    label: 'Pending',
+    variant: 'pending' as const,
+    tasks: tasksGroupedByStatus.value.pending || [],
+  },
+  waiting: {
+    label: 'Waiting',
+    variant: 'waiting' as const,
+    tasks: tasksGroupedByStatus.value.waiting || [],
+  },
+  in_progress: {
+    label: 'In Progress',
+    variant: 'in_progress' as const,
+    tasks: tasksGroupedByStatus.value.in_progress || [],
+  } as const,
+  in_review: {
+    label: 'In Review',
+    variant: 'in_review',
+    tasks: tasksGroupedByStatus.value.in_review || [],
+  } as const,
+  completed: {
+    label: 'Completed',
+    variant: 'completed' as const,
+    tasks: tasksGroupedByStatus.value.completed || [],
+  },
 })
-
-const taskBoardRef = useTemplateRef<UseDraggableReturn>('pending-tasks')
 
 const onEnd = async (e: DraggableEvent) => {
   const fromState = e.from.dataset.taskState
@@ -92,50 +111,34 @@ const onEnd = async (e: DraggableEvent) => {
     return
   }
 
-  tasksByState[toState].map((task, index) => {
+  tasksByState[toState].tasks.map((task, index) => {
     task.state = toState
     task.order = index + 1 // The order is the reflection of its current position
     return task
   })
 
   // Call API to update all tasks in toState
-  const { data, error } = await useFetch(
-    '/api/project/:projectId/task/reorder',
-    {
-      method: 'PUT',
-      body: tasksByState[toState],
-    }
-  )
-
-  console.log({
-    reorder: {
-      tasks: data.value,
-      error: error.value,
+  await $fetch(`/api/project/${projectId}/task/reorder`, {
+    method: 'PUT',
+    body: tasksByState[toState].tasks,
+    ignoreResponseError: true,
+    onResponse ({ response }) {
+      console.log('RESPONSE', response)
     },
   })
 }
-
-watch(
-  tasksByState,
-  () => {
-    console.log({
-      tasksByState,
-    })
-  },
-  { immediate: true }
-)
 </script>
 
-<style>
-.sortable-chosen {
-  background: red;
+<style scoped>
+@reference 'tailwindcss';
+
+:global(.sortable-chosen) {
+  @apply border-2 border-slate-400;
 }
-.sortable-drag {
-  background: greenyellow;
-  padding: 20px;
+:global(.sortable-drag) {
+  @apply shadow-2xl border-none;
 }
-.sortable-ghost {
-  background: blue;
-  padding: 12px;
+:global(.sortable-ghost) {
+  @apply border-2 border-slate-400;
 }
 </style>

@@ -7,21 +7,22 @@
       <h4>{{ heading }}</h4>
     </div>
 
-    <div class="my-4 select-none bg-transparent border-1 border-slate-500 text-slate-500 text-center font-bold text-xs uppercase p-1.5">
-      Drop your task here
+    <div class="my-4 select-none bg-transparent border-1 border-slate-500 text-slate-500 hover:border-slate-500/30 hover:text-slate-500/30 text-center font-bold text-xs uppercase p-1.5">
+      <span>Drop your task here</span>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-export type TaskState = 'pending' | 'waiting' | 'in_progress' | 'in_review' | 'completed'
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const props = defineProps<{
+type ColumnHeaderProps = {
   heading: string;
   variant: TaskState
-}>()
+}
 
-const variantColors: Record<typeof props.variant, string> = {
+export type TaskState = 'pending' | 'waiting' | 'in_progress' | 'in_review' | 'completed'
+defineProps<ColumnHeaderProps>()
+
+const variantColors: Record<ColumnHeaderProps['variant'], string> = {
   pending: 'before:bg-slate-700',
   waiting: 'before:bg-red-500',
   in_progress: 'before:bg-blue-500',

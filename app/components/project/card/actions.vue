@@ -1,5 +1,6 @@
 <template>
-    <DropdownMenu>
+  <ClientOnly>
+     <DropdownMenu>
         <DropdownMenuTrigger>
           <Button variant="ghost">
             <EllipsisVertical class="text-zinc-400 size-[20px]" />
@@ -13,14 +14,14 @@
           <DropdownMenuGroup>
             <DropdownMenuItem>
               <NuxtLink
-                :to="`project/${id}`"
+                :to="`project/${projectId}`"
               >
                 Go to project
               </NuxtLink>
             </DropdownMenuItem>
 
             <DropdownMenuItem>
-              <NuxtLink :to="`project/${id}/update`">
+              <NuxtLink :to="`project/${projectId}/update`">
                 Edit Project
               </NuxtLink>
             </DropdownMenuItem>
@@ -33,13 +34,14 @@
           </DropdownMenuGroup>
         </DropdownMenuContent>
       </DropdownMenu>
+  </ClientOnly>
 </template>
 
 <script setup lang="ts">
 import { EllipsisVertical } from 'lucide-vue-next'
 import type { Project } from '~~/server/types'
 
-defineProps<{ id: Project['id'] }>()
+defineProps<{ projectId: Project['id'] }>()
 
 </script>
 
