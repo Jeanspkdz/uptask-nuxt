@@ -1,4 +1,4 @@
-import { eq } from 'drizzle-orm'
+import { and, eq } from 'drizzle-orm'
 import { projectTable } from '~~/server/db/schema/project'
 import { projectTaskTable } from '~~/server/db/schema/project-task'
 import { GENERIC_ERRORS } from '~~/server/errors'
@@ -34,7 +34,7 @@ export default defineEventHandler(async (event) => {
 
   const lastOrder = await db.$count(
     projectTaskTable,
-    eq(projectTaskTable.projectId, projectId)
+    and(eq(projectTaskTable.projectId, projectId), eq(projectTaskTable.state, 'pending'))
   ) + 1
 
   const [taskInserted] = await db
