@@ -22,7 +22,7 @@ export const projectTaskTable = pgTable('project_tasks', {
   projectId: t.text('project_id').references(() => projectTable.id, { onDelete: 'cascade' }),
   ...timestamps
 }, (table) => [
-  t.unique().on(table.projectId, table.order)
+  t.unique().on(table.projectId, table.order, table.state)
 ])
 
 export const projectTaskRelations = relations(projectTaskTable, ({ one }) => ({

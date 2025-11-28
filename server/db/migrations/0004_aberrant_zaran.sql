@@ -1,0 +1,2 @@
+ALTER TABLE "project_tasks" DROP CONSTRAINT "project_tasks_project_id_order_unique";--> statement-breakpoint
+ALTER TABLE "project_tasks" ADD CONSTRAINT "project_tasks_project_id_order_state_unique" UNIQUE("project_id","order","state");

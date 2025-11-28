@@ -7,7 +7,7 @@
       <h4>{{ heading }}</h4>
     </div>
 
-    <div class="my-4 select-none bg-transparent border-1 border-slate-500 text-slate-500 hover:border-slate-500/30 hover:text-slate-500/30 text-center font-bold text-xs uppercase p-1.5">
+    <div class="my-4 select-none bg-transparent border-1 border-slate-500 text-slate-500 hover:border-slate-500/70 hover:text-slate-500/70 text-center font-bold text-xs uppercase p-1.5">
       <span>Drop your task here</span>
     </div>
   </div>

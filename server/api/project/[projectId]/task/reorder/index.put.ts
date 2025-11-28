@@ -5,17 +5,13 @@ import { projectTaskTable, taskState } from '~~/server/db/schema/project-task'
 import type { ErrorData } from '~~/server/errors'
 import { GENERIC_ERRORS } from '~~/server/errors'
 
-//  id: task.id,
-//         name: task.name,
-//         state: task.state,
-//         description: task.description,
-
 const routerBodyValidator = z.array(
   z.object({
     id: z.cuid2(),
     name: z.string(),
     state: z.enum(taskState.enumValues),
     description: z.string(),
+    order: z.number().min(1)
   })
 )
 
@@ -40,20 +36,34 @@ export default defineEventHandler(async (event) => {
   }
 
   const data = validatedBody.data
-
-  const updatedProjectTasks = await db.transaction(async (tx) => {
-    const updatedTaskPromise = data.map(async (pTask) => {
-      if (pTask.id) {
-        return tx
-          .update(projectTaskTable)
-          .set(pTask)
-          .where(eq(projectTaskTable.id, pTask.id))
-          .returning()
+  try {
+    await db.transaction(async (tx) => {
+      try {
+        const tasksPromise = data.toReversed().map(async (pTask) => {
+          if (pTask.id) {
+            return tx
+              .update(projectTaskTable)
+              .set({
+                name: pTask.name,
+                description: pTask.description,
+                order: pTask.order,
+                state: pTask.state
+              })
+              .where(eq(projectTaskTable.id, pTask.id))
+              .returning()
+          }
+        })
+        await Promise.all(tasksPromise)
+      } catch {
+        tx.rollback()
       }
-      tx.rollback()
+    }, {
+      deferrable: true,
     })
-    return await Promise.all(updatedTaskPromise)
-  })
+  } catch (error) {
+    console.log(error)
+    throw error
+  }
 
-  return updatedProjectTasks
+  return ''
 })

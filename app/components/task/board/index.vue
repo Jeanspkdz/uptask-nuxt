@@ -15,7 +15,11 @@
         <VueDraggable
           ref="pending-tasks"
           v-model="val.tasks"
+          :disabled="isSending"
           class="flex flex-col gap-4 min-h-32"
+          :class="{
+            'opacity-60 cursor-not-allowed': isSending
+          }"
           :group="{
             name: 'tasks',
           }"
@@ -54,6 +58,9 @@
 import { VueDraggable, type DraggableEvent } from 'vue-draggable-plus'
 import type { Task } from '~~/server/types'
 import type { TaskState } from './column-header.vue'
+import { toast } from 'vue-sonner'
+import { getErrorMessage } from '~/errors'
+import { useCloned } from '@vueuse/core'
 
 type TaskPayload = Pick<
   Task,
@@ -62,6 +69,7 @@ type TaskPayload = Pick<
 
 const route = useRoute()
 const projectId = route.params.id
+const isSending = ref(false)
 
 const { tasks = [] } = defineProps<{
   tasks?: TaskPayload[];
@@ -72,7 +80,7 @@ const tasksGroupedByStatus = computed(() => {
   return Object.groupBy(tasks, (task) => task.state)
 })
 
-const tasksByState = reactive({
+const prevtasksByState = reactive({
   pending: {
     label: 'Pending',
     variant: 'pending' as const,
@@ -87,21 +95,25 @@ const tasksByState = reactive({
     label: 'In Progress',
     variant: 'in_progress' as const,
     tasks: tasksGroupedByStatus.value.in_progress || [],
-  } as const,
+  },
   in_review: {
     label: 'In Review',
-    variant: 'in_review',
+    variant: 'in_review' as const,
     tasks: tasksGroupedByStatus.value.in_review || [],
-  } as const,
+  },
   completed: {
     label: 'Completed',
     variant: 'completed' as const,
     tasks: tasksGroupedByStatus.value.completed || [],
   },
 })
+const { cloned: tasksByState, sync } = useCloned(prevtasksByState, {
+  manual: true,
+  deep: true,
+})
 
 const onEnd = async (e: DraggableEvent) => {
-  const fromState = e.from.dataset.taskState
+  const fromState = e.from.dataset.taskState as TaskState
   const toState = e.to.dataset.taskState as TaskState
 
   const fromIndex = e.oldDraggableIndex
@@ -111,22 +123,52 @@ const onEnd = async (e: DraggableEvent) => {
     return
   }
 
-  tasksByState[toState].tasks.map((task, index) => {
-    task.state = toState
-    task.order = index + 1 // The order is the reflection of its current position
-    return task
+  tasksByState.value[fromState].tasks.forEach((task, index) => {
+    task.order = index + 1
   })
 
-  // Call API to update all tasks in toState
-  await $fetch(`/api/project/${projectId}/task/reorder`, {
-    method: 'PUT',
-    body: tasksByState[toState].tasks,
-    ignoreResponseError: true,
-    onResponse ({ response }) {
-      console.log('RESPONSE', response)
-    },
+  tasksByState.value[toState].tasks.forEach((task, index) => {
+    task.state = toState
+    task.order = index + 1 // The order is the reflection of its current position
   })
+
+  isSending.value = true
+
+  // Call API to update all tasks in toState
+  try {
+    await $fetch(`/api/project/${projectId}/task/reorder`, {
+      method: 'PUT',
+      body: tasksByState.value[toState].tasks,
+    })
+
+    // From Column
+    await $fetch(`/api/project/${projectId}/task/reorder`, {
+      method: 'PUT',
+      body: tasksByState.value[fromState].tasks,
+      ignoreResponseError: true,
+    })
+
+    toast.success('Task Updated Succesfully', {
+      position: 'top-right',
+    })
+
+    // Update prevState to match the sucessfull one
+    Object.keys(prevtasksByState).forEach((key) => {
+      const stateKey = key as TaskState
+      prevtasksByState[stateKey].tasks = tasksByState.value[stateKey].tasks.map(
+        (t) => ({ ...t })
+      )
+    })
+  } catch {
+    toast.error(getErrorMessage('GENERIC', 'UNKNOWN'), {
+      position: 'top-right',
+    })
+    sync()
+  } finally {
+    isSending.value = false
+  }
 }
+
 </script>
 
 <style scoped>
