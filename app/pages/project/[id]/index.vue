@@ -28,7 +28,7 @@
         <div v-if="projectTasksPending">
           <TaskBoardSkeleton/>
         </div>
-        <TaskBoard v-else :tasks="projectTasks" />
+        <TaskBoard v-else :tasks="projectTasks ?? []" />
       </div>
     </div>
   </section>
@@ -52,18 +52,19 @@ const {
 } = useProject(() => projectId)
 const {
   projectTasks,
-  error: projectTaskError,
   pending: projectTasksPending,
 } = useProjectTasks(() => projectId)
 
+const handleAddNewTask = async (task: Task) => {
+  // await refreshProjectTasks()
+  projectTasks.value = [...projectTasks.value ?? [], task]
+}
+
 watchEffect(() => {
   console.log({
-    projectPending: projectPending.value,
-    project: project.value,
+    projectTask: projectTasks.value
   })
 })
-
-const handleAddNewTask = (task: Task) => {}
 </script>
 
 <style scoped></style>

@@ -1,69 +1,79 @@
 import { eq } from 'drizzle-orm'
 import { readValidatedBody } from 'h3'
+import { FetchError } from 'ofetch'
 import { z } from 'zod'
-import { projectTaskTable, taskState } from '~~/server/db/schema/project-task'
+import { projectTaskTable } from '~~/server/db/schema/project-task'
 import type { ErrorData } from '~~/server/errors'
 import { GENERIC_ERRORS } from '~~/server/errors'
+import { projectTaskReorderShape } from '~~/server/utils/validator'
 
-const routerBodyValidator = z.array(
-  z.object({
-    id: z.cuid2(),
-    name: z.string(),
-    state: z.enum(taskState.enumValues),
-    description: z.string(),
-    order: z.number().min(1)
-  })
-)
+const routerBodyValidator = z.array(projectTaskReorderShape)
 
 export default defineEventHandler(async (event) => {
-  const validatedBody = await readValidatedBody(
-    event,
-    routerBodyValidator.safeParse
-  )
+  try {
+    const validatedBody = await readValidatedBody(
+      event,
+      routerBodyValidator.safeParse
+    )
 
-  if (!validatedBody.success) {
-    console.log(z.prettifyError(validatedBody.error))
+    if (!validatedBody.success) {
+      console.log(z.prettifyError(validatedBody.error))
+
+      throw createError<ErrorData>({
+        statusCode: 400,
+        statusMessage: GENERIC_ERRORS['BAD_REQUEST']['code'],
+        data: {
+          ...GENERIC_ERRORS['BAD_REQUEST'],
+          reason: 'Request payload failed validation',
+          scope: 'GENERIC',
+        },
+      })
+    }
+
+    const data = validatedBody.data
+
+    const reorderedTasks = await db.transaction(
+      async (tx) => {
+        const tasksPromise = data.map((pTask) => {
+          return tx
+            .update(projectTaskTable)
+            .set({
+              name: pTask.name,
+              description: pTask.description,
+              order: pTask.order,
+              state: pTask.state,
+            })
+            .where(eq(projectTaskTable.id, pTask.id))
+            .returning()
+        })
+
+        const results = await Promise.all(tasksPromise)
+        return results.flat(1)
+      },
+      {
+        deferrable: true,
+        isolationLevel: 'serializable'
+      }
+    )
+
+    return reorderedTasks
+  } catch (error) {
+    if (error instanceof FetchError) {
+      throw createError<ErrorData>({
+        ...error
+      })
+    }
+
+    console.log('[RERORDER_TASKS_ERROR]', error)
 
     throw createError<ErrorData>({
-      statusCode: 400,
-      statusMessage: GENERIC_ERRORS['BAD_REQUEST']['code'],
+      statusCode: 500,
+      statusMessage: GENERIC_ERRORS['UNKNOWN']['code'],
       data: {
-        ...GENERIC_ERRORS['BAD_REQUEST'],
-        reason: 'Request payload failed validation',
+        ...GENERIC_ERRORS['UNKNOWN'],
         scope: 'GENERIC',
-      },
-    })
-  }
-
-  const data = validatedBody.data
-  try {
-    await db.transaction(async (tx) => {
-      try {
-        const tasksPromise = data.toReversed().map(async (pTask) => {
-          if (pTask.id) {
-            return tx
-              .update(projectTaskTable)
-              .set({
-                name: pTask.name,
-                description: pTask.description,
-                order: pTask.order,
-                state: pTask.state
-              })
-              .where(eq(projectTaskTable.id, pTask.id))
-              .returning()
-          }
-        })
-        await Promise.all(tasksPromise)
-      } catch {
-        tx.rollback()
+        reason: 'An unexpected error ocurred'
       }
-    }, {
-      deferrable: true,
     })
-  } catch (error) {
-    console.log(error)
-    throw error
   }
-
-  return ''
 })

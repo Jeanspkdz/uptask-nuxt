@@ -61,6 +61,7 @@ import type { TaskState } from './column-header.vue'
 import { toast } from 'vue-sonner'
 import { getErrorMessage } from '~/errors'
 import { useCloned } from '@vueuse/core'
+import { FetchError } from 'ofetch'
 
 type TaskPayload = Pick<
   Task,
@@ -71,103 +72,112 @@ const route = useRoute()
 const projectId = route.params.id
 const isSending = ref(false)
 
-const { tasks = [] } = defineProps<{
-  tasks?: TaskPayload[];
+const { tasks } = defineProps<{
+  tasks: TaskPayload[];
 }>()
 
-const tasksGroupedByStatus = computed(() => {
-  if (!tasks) return {}
-  return Object.groupBy(tasks, (task) => task.state)
+const prevtasksByState = computed(() => {
+  const tasksGroupedByStatus = Object.groupBy(tasks, (task) => task.state)
+
+  return {
+    pending: {
+      label: 'Pending',
+      variant: 'pending' as const,
+      tasks: tasksGroupedByStatus.pending || [],
+    },
+    waiting: {
+      label: 'Waiting',
+      variant: 'waiting' as const,
+      tasks: tasksGroupedByStatus.waiting || [],
+    },
+    in_progress: {
+      label: 'In Progress',
+      variant: 'in_progress' as const,
+      tasks: tasksGroupedByStatus.in_progress || [],
+    },
+    in_review: {
+      label: 'In Review',
+      variant: 'in_review' as const,
+      tasks: tasksGroupedByStatus.in_review || [],
+    },
+    completed: {
+      label: 'Completed',
+      variant: 'completed' as const,
+      tasks: tasksGroupedByStatus.completed || [],
+    },
+  }
 })
 
-const prevtasksByState = reactive({
-  pending: {
-    label: 'Pending',
-    variant: 'pending' as const,
-    tasks: tasksGroupedByStatus.value.pending || [],
-  },
-  waiting: {
-    label: 'Waiting',
-    variant: 'waiting' as const,
-    tasks: tasksGroupedByStatus.value.waiting || [],
-  },
-  in_progress: {
-    label: 'In Progress',
-    variant: 'in_progress' as const,
-    tasks: tasksGroupedByStatus.value.in_progress || [],
-  },
-  in_review: {
-    label: 'In Review',
-    variant: 'in_review' as const,
-    tasks: tasksGroupedByStatus.value.in_review || [],
-  },
-  completed: {
-    label: 'Completed',
-    variant: 'completed' as const,
-    tasks: tasksGroupedByStatus.value.completed || [],
-  },
-})
 const { cloned: tasksByState, sync } = useCloned(prevtasksByState, {
-  manual: true,
   deep: true,
 })
 
 const onEnd = async (e: DraggableEvent) => {
-  const fromState = e.from.dataset.taskState as TaskState
-  const toState = e.to.dataset.taskState as TaskState
-
-  const fromIndex = e.oldDraggableIndex
-  const toIndex = e.newDraggableIndex
-
-  if (fromState === toState && fromIndex === toIndex) {
-    return
-  }
-
-  tasksByState.value[fromState].tasks.forEach((task, index) => {
-    task.order = index + 1
-  })
-
-  tasksByState.value[toState].tasks.forEach((task, index) => {
-    task.state = toState
-    task.order = index + 1 // The order is the reflection of its current position
-  })
-
-  isSending.value = true
-
-  // Call API to update all tasks in toState
   try {
+    const fromState = e.from.dataset.taskState as TaskState
+    const toState = e.to.dataset.taskState as TaskState
+
+    const fromIndex = e.oldDraggableIndex
+    const toIndex = e.newDraggableIndex
+
+    if (fromState === toState && fromIndex === toIndex) {
+      return
+    }
+
+    tasksByState.value[fromState].tasks.forEach((task, index) => {
+      task.order = index + 1
+    })
+
+    tasksByState.value[toState].tasks.forEach((task, index) => {
+      task.state = toState
+      task.order = index + 1 // The order is the reflection of its current position
+    })
+
+    isSending.value = true
+
+    // Call API to reorder tasks
     await $fetch(`/api/project/${projectId}/task/reorder`, {
       method: 'PUT',
       body: tasksByState.value[toState].tasks,
     })
 
-    // From Column
     await $fetch(`/api/project/${projectId}/task/reorder`, {
       method: 'PUT',
       body: tasksByState.value[fromState].tasks,
-      ignoreResponseError: true,
+    })
+
+    // Update prevState to match the sucessfull one
+    Object.keys(prevtasksByState.value).forEach((key) => {
+      const stateKey = key as TaskState
+      prevtasksByState.value[stateKey].tasks = tasksByState.value[stateKey].tasks.map(
+        (t) => ({ ...t })
+      )
     })
 
     toast.success('Task Updated Succesfully', {
       position: 'top-right',
     })
+  } catch (error) {
+    sync()
 
-    // Update prevState to match the sucessfull one
-    Object.keys(prevtasksByState).forEach((key) => {
-      const stateKey = key as TaskState
-      prevtasksByState[stateKey].tasks = tasksByState.value[stateKey].tasks.map(
-        (t) => ({ ...t })
-      )
-    })
-  } catch {
+    if (error instanceof FetchError) {
+      console.dir(error)
+      toast.error(getErrorMessage(error.data.data.scope, error.data.data.code), {
+        position: 'top-right'
+      })
+      return
+    }
     toast.error(getErrorMessage('GENERIC', 'UNKNOWN'), {
       position: 'top-right',
     })
-    sync()
   } finally {
     isSending.value = false
   }
 }
+
+watch(() => tasks, () => {
+  sync()
+})
 
 </script>
 

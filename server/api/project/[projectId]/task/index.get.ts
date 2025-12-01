@@ -1,4 +1,4 @@
-import { eq } from 'drizzle-orm'
+import { asc, eq } from 'drizzle-orm'
 import z from 'zod'
 import { projectTable } from '~~/server/db/schema/project'
 import { projectTaskTable } from '~~/server/db/schema/project-task'
@@ -55,6 +55,7 @@ export default defineEventHandler(async (event) => {
     .select()
     .from(projectTaskTable)
     .where(eq(projectTaskTable.projectId, projectId))
+    .orderBy(asc(projectTaskTable.order))
 
   return tasks ?? []
 })

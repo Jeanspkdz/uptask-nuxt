@@ -7,3 +7,11 @@ export const projectTaskInsertSchema = createInsertSchema(projectTaskTable)
 export const projectTaskInsertSchemaArray = z.array(projectTaskInsertSchema)
 export const projectTaskUpdateSchema = createUpdateSchema(projectTaskTable)
 export const projectTaskUpdateSchemaArray = z.array(projectTaskInsertSchema)
+
+export const projectTaskReorderShape = projectTaskSelectSchema.pick({
+  id: true,
+  state: true,
+  description: true,
+  order: true,
+  name: true
+})
