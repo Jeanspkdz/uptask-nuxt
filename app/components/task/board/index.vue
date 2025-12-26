@@ -18,7 +18,7 @@
           :disabled="isSending"
           class="flex flex-col gap-4 min-h-32"
           :class="{
-            'opacity-60 cursor-not-allowed': isSending
+            'opacity-60 cursor-not-allowed': isSending,
           }"
           :group="{
             name: 'tasks',
@@ -36,8 +36,7 @@
           <TaskCard
             v-for="item in val.tasks"
             :key="item.id"
-            :name="item.name"
-            :description="item.description"
+            :task="item"
             class="select-none"
           />
         </VueDraggable>
@@ -149,9 +148,9 @@ const onEnd = async (e: DraggableEvent) => {
     // Update prevState to match the sucessfull one
     Object.keys(prevtasksByState.value).forEach((key) => {
       const stateKey = key as TaskState
-      prevtasksByState.value[stateKey].tasks = tasksByState.value[stateKey].tasks.map(
-        (t) => ({ ...t })
-      )
+      prevtasksByState.value[stateKey].tasks = tasksByState.value[
+        stateKey
+      ].tasks.map((t) => ({ ...t }))
     })
 
     toast.success('Task Updated Succesfully', {
@@ -162,9 +161,12 @@ const onEnd = async (e: DraggableEvent) => {
 
     if (error instanceof FetchError) {
       console.dir(error)
-      toast.error(getErrorMessage(error.data.data.scope, error.data.data.code), {
-        position: 'top-right'
-      })
+      toast.error(
+        getErrorMessage(error.data.data.scope, error.data.data.code),
+        {
+          position: 'top-right',
+        }
+      )
       return
     }
     toast.error(getErrorMessage('GENERIC', 'UNKNOWN'), {
@@ -175,10 +177,12 @@ const onEnd = async (e: DraggableEvent) => {
   }
 }
 
-watch(() => tasks, () => {
-  sync()
-})
-
+watch(
+  () => tasks,
+  () => {
+    sync()
+  }
+)
 </script>
 
 <style scoped>

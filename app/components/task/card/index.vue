@@ -1,23 +1,29 @@
 <template>
-  <article class="shadow-sm bg-white pl-4 pr-3 py-3 flex ">
-    <div data-draggable class="flex-1">
-      <h4 class="font-bold text-xl text-slate-700 text-balance">{{ name }}</h4>
-      <p class="mt-4 text-base">{{ description }}</p>
+  <article class="shadow-sm bg-white pl-4 pr-3 py-3 flex flex-col">
+    <div class="flex-1 flex gap-x-1.5">
+      <h4
+        class="flex-1 font-bold text-xl text-slate-700 text-balance"
+        data-draggable
+      >
+        {{ task.name }}
+      </h4>
+      <TaskCardActions
+        :task="task"
+      />
     </div>
 
-    <div class="self-start">
-      <TaskCardActions/>
+    <div data-draggable class="">
+      <p class="mt-4 text-base">{{ task.description }}</p>
     </div>
   </article>
 </template>
 
 <script setup lang="ts">
+import type { Task } from '~~/server/types'
+
 defineProps<{
-  name: string;
-  description: string;
+  task: Task;
 }>()
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>
