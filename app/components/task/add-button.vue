@@ -41,12 +41,13 @@
 </template>
 
 <script setup lang="ts">
-import z from 'zod'
 import Textarea from '@/components/ui/textarea/Textarea.vue'
-import { useForm } from 'vee-validate'
 import { toTypedSchema } from '@vee-validate/zod'
+import { useForm } from 'vee-validate'
 import { toast } from 'vue-sonner'
+import z from 'zod'
 import { getErrorMessage } from '~/errors'
+
 import type { ErrorData } from '~~/server/errors'
 import type { Task } from '~~/server/types'
 
@@ -85,8 +86,6 @@ const handleAddNewTask = (closeDialog: () => void) => {
             toast.success('Task Created Successfully!!')
             actions.resetForm()
             closeDialog()
-            console.log('succes', response)
-
             emit('taskCreated', response._data)
             return
           }

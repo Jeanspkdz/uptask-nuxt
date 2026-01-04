@@ -62,17 +62,12 @@ import { getErrorMessage } from '~/errors'
 import { useCloned } from '@vueuse/core'
 import { FetchError } from 'ofetch'
 
-type TaskPayload = Pick<
-  Task,
-  'id' | 'name' | 'order' | 'state' | 'description'
->
-
 const route = useRoute()
 const projectId = route.params.id
 const isSending = ref(false)
 
 const { tasks } = defineProps<{
-  tasks: TaskPayload[];
+  tasks: Task[];
 }>()
 
 const prevtasksByState = computed(() => {

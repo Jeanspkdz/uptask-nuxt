@@ -60,11 +60,6 @@ const handleAddNewTask = async (task: Task) => {
   projectTasks.value = [...projectTasks.value ?? [], task]
 }
 
-watchEffect(() => {
-  console.log({
-    projectTask: projectTasks.value
-  })
-})
 </script>
 
 <style scoped></style>

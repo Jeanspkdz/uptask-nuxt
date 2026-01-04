@@ -24,10 +24,14 @@
     </div>
 
     <div>
-      <h3 class="text-3xl font-semibold mb-3">{{ taskDetails.name }}</h3>
-      <p class="font-semibold text-lg  text-slate-500">
-        {{ taskDetails.description }}
-      </p>
+      <DialogHeader>
+        <DialogTitle class="text-3xl font-semibold mb-3">{{
+          taskDetails.name
+        }}</DialogTitle>
+        <DialogDescription class="font-semibold text-lg text-slate-500">
+          {{ taskDetails.description }}
+        </DialogDescription>
+      </DialogHeader>
 
       <Label class="mt-4 font-bold">Current State</Label>
 
@@ -80,6 +84,10 @@ const props = defineProps<{
   >;
 }>()
 
+watchEffect(() => {
+  console.log('PROPS', props.taskDetails)
+})
+
 const taskNewState = ref(props.taskDetails.state)
 
 const taskStates: Record<TaskState, string> = {
@@ -103,17 +111,12 @@ const { handleSubmit, meta } = useForm({
   initialValues: {
     noteName: '',
   },
-  validateOnMount: false
+  validateOnMount: false,
 })
 
 const handleCreateNote = handleSubmit((val) => {
   console.log(val)
 })
-
-watchEffect(() => {
-  console.log(meta.value)
-})
-
 </script>
 
 <style scoped></style>

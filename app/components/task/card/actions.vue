@@ -12,8 +12,14 @@
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
           <!-- DIALOG_TRIGGER -->
-          <DialogTrigger as-child >
-            <DropdownMenuItem>
+          <DialogTrigger as-child>
+            <DropdownMenuItem
+              @select="
+                () => {
+                  console.log('Hicsite click');
+                }
+              "
+            >
               Go to Task
             </DropdownMenuItem>
           </DialogTrigger>
@@ -31,9 +37,8 @@
 
     <DialogContent>
       <div>
-        <TaskDetailsContent
-          :task-details="task"
-        />
+        <!-- <component :is="currentModal['detailModal']" /> -->
+        <TaskModalDetail :task-details="task" />
       </div>
     </DialogContent>
   </Dialog>
@@ -42,10 +47,20 @@
 <script setup lang="ts">
 import { EllipsisVertical } from 'lucide-vue-next'
 import type { Task } from '~~/server/types'
-defineProps<{
-  task: Task
+import { TaskModalDetail } from '#components'
+
+const props = defineProps<{
+  task: Task;
 }>()
 
+const currentModal = {
+  detailModal: TaskModalDetail,
+  // editModal :
+} as const
+
+watchEffect(() => {
+  console.log('PROPS-ACTIONS', props.task)
+})
 </script>
 
 <style scoped></style>
