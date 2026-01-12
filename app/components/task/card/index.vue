@@ -1,14 +1,15 @@
 <template>
   <article class="shadow-sm bg-white pl-4 pr-3 py-3 flex flex-col">
-    <div class="flex-1 flex gap-x-1.5">
+    <div class="flex-1 flex gap-x-1.5  relative pr-10">
       <h4
-        class="flex-1 font-bold text-xl text-slate-700 text-balance"
+        class="font-bold text-xl text-slate-700 text-balance"
         data-draggable
       >
         {{ task.name }}
       </h4>
       <TaskCardActions
         :task="task"
+        class="absolute top-0 right-0"
       />
     </div>
 

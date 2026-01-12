@@ -25,16 +25,15 @@
 
     <div>
       <DialogHeader>
-        <DialogTitle class="text-3xl font-semibold mb-3">{{
+        <DialogTitle class="text-3xl font-bold">{{
           taskDetails.name
         }}</DialogTitle>
-        <DialogDescription class="font-semibold text-lg text-slate-500">
+        <DialogDescription class="font-bold text-lg text-slate-500">
           {{ taskDetails.description }}
         </DialogDescription>
       </DialogHeader>
 
-      <Label class="mt-4 font-bold">Current State</Label>
-
+      <Label class="mt-7 font-bold">Current State</Label>
       <Select v-model="taskNewState" class="">
         <SelectTrigger class="mt-3 w-full mb-4">
           <SelectValue placeholder="Update the task state" />
@@ -83,10 +82,6 @@ const props = defineProps<{
     'name' | 'state' | 'createdAt' | 'updatedAt' | 'description'
   >;
 }>()
-
-watchEffect(() => {
-  console.log('PROPS', props.taskDetails)
-})
 
 const taskNewState = ref(props.taskDetails.state)
 

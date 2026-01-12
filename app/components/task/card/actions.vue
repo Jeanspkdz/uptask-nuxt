@@ -2,7 +2,7 @@
   <Dialog>
     <DropdownMenu data-not-draggable>
       <DropdownMenuTrigger as-child>
-        <Button variant="ghost">
+        <Button variant="ghost" :class="$attrs.class">
           <EllipsisVertical class="size-[20px]" />
         </Button>
       </DropdownMenuTrigger>
@@ -13,54 +13,66 @@
         <DropdownMenuGroup>
           <!-- DIALOG_TRIGGER -->
           <DialogTrigger as-child>
-            <DropdownMenuItem
-              @select="
-                () => {
-                  console.log('Hicsite click');
-                }
-              "
-            >
+            <DropdownMenuItem @select="changeCardModalType('detail')">
               Go to Task
             </DropdownMenuItem>
           </DialogTrigger>
 
-          <DropdownMenuItem> Edit Project </DropdownMenuItem>
+          <DialogTrigger as-child>
+            <DropdownMenuItem @select="changeCardModalType('update')">
+              Edit Project
+            </DropdownMenuItem>
+          </DialogTrigger>
 
-          <DropdownMenuItem
-            class="text-red-500 hover:text-red-700 focus:text-red-700"
-          >
-            Delete Project
-          </DropdownMenuItem>
+          <DialogTrigger as-child>
+            <DropdownMenuItem
+              class="text-red-500 hover:text-red-700 focus:text-red-700"
+              @select="changeCardModalType('delete')"
+            >
+              Delete Project
+            </DropdownMenuItem>
+          </DialogTrigger>
         </DropdownMenuGroup>
       </DropdownMenuContent>
     </DropdownMenu>
 
     <DialogContent>
       <div>
-        <!-- <component :is="currentModal['detailModal']" /> -->
-        <TaskModalDetail :task-details="task" />
+        <TaskModalDetail
+          v-if="currentCardModalType == 'detail'"
+          :task-details="task"
+        />
+        <TaskModalEdit
+          v-else-if="currentCardModalType == 'update'"
+          :name="task.name"
+          :description="task.description"
+        />
+        <div v-else>Nani??</div>
       </div>
     </DialogContent>
   </Dialog>
 </template>
 
 <script setup lang="ts">
+import { TaskModalDetail, TaskModalEdit } from '#components'
 import { EllipsisVertical } from 'lucide-vue-next'
 import type { Task } from '~~/server/types'
-import { TaskModalDetail } from '#components'
 
-const props = defineProps<{
+defineOptions({
+  inheritAttrs: false
+})
+
+defineProps<{
   task: Task;
 }>()
 
-const currentModal = {
-  detailModal: TaskModalDetail,
-  // editModal :
-} as const
+type CardModalTypes = 'delete' | 'update' | 'detail'
 
-watchEffect(() => {
-  console.log('PROPS-ACTIONS', props.task)
-})
+const currentCardModalType = ref<CardModalTypes>('detail')
+
+const changeCardModalType = (modalType: CardModalTypes) => {
+  currentCardModalType.value = modalType
+}
 </script>
 
 <style scoped></style>

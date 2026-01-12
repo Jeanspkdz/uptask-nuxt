@@ -3,7 +3,7 @@
     <div
       v-for="(val, key) in tasksByState"
       :key="key"
-      class="min-w-full flex-1 md:min-w-auto"
+      class="min-w-full lg:min-w-2/5 xl:min-w-auto  xl:w-1/5"
     >
       <TaskBoardColumnHeader
         :heading="val.label"
