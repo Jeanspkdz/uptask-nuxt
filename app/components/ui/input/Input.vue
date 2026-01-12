@@ -6,17 +6,28 @@ import { cn } from '@/lib/utils'
 const props = defineProps<{
   defaultValue?: string | number
   modelValue?: string | number
+  value?: string | number
   class?: HTMLAttributes['class']
 }>()
 
 const emits = defineEmits<{
-  (e: 'update:modelValue', payload: string | number): void
+  (e: 'update:modelValue' | 'update:value', payload: string | number): void
 }>()
 
-const modelValue = useVModel(props, 'modelValue', emits, {
+const keyValue = props.modelValue !== undefined ? 'modelValue' : 'value'
+
+// const modelValue = defineModel<string>({ default: '' })
+const modelValue = useVModel(props, keyValue, emits, {
   passive: true,
   defaultValue: props.defaultValue,
 })
+
+watchEffect(() => {
+  console.log(keyValue)
+
+  console.log(modelValue.value)
+})
+
 </script>
 
 <template>
