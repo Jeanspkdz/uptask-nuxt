@@ -1,9 +1,6 @@
-import { relations } from 'drizzle-orm'
-import { pgTable, text, timestamp, boolean } from 'drizzle-orm/pg-core'
-import { collaborator } from './collaborator'
-import { projectTable } from './project'
+import { boolean, pgTable, text, timestamp } from 'drizzle-orm/pg-core'
 
-export const user = pgTable('users', {
+export const userTable = pgTable('users', {
   id: text('id').primaryKey(),
   name: text('name').notNull(),
   email: text('email').notNull().unique(),
@@ -15,10 +12,6 @@ export const user = pgTable('users', {
     .$onUpdate(() => /* @__PURE__ */ new Date())
     .notNull(),
 })
-export const userRelations = relations(user, ({ many, }) => ({
-  project: many(projectTable),
-  collaborator: many(collaborator),
-}))
 
 export const session = pgTable('sessions', {
   id: text('id').primaryKey(),
@@ -32,7 +25,7 @@ export const session = pgTable('sessions', {
   userAgent: text('user_agent'),
   userId: text('user_id')
     .notNull()
-    .references(() => user.id, { onDelete: 'cascade' }),
+    .references(() => userTable.id, { onDelete: 'cascade' }),
 })
 
 export const account = pgTable('accounts', {
@@ -41,7 +34,7 @@ export const account = pgTable('accounts', {
   providerId: text('provider_id').notNull(),
   userId: text('user_id')
     .notNull()
-    .references(() => user.id, { onDelete: 'cascade' }),
+    .references(() => userTable.id, { onDelete: 'cascade' }),
   accessToken: text('access_token'),
   refreshToken: text('refresh_token'),
   idToken: text('id_token'),

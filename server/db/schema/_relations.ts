@@ -1,0 +1,39 @@
+import { defineRelations } from 'drizzle-orm'
+import { userTable as user } from './auth-schema'
+import { projectTaskTable as projectTask } from './project-task'
+import { projectTable as project } from './project'
+import { collaborator } from './collaborator'
+import { taskNoteTable as taskNote } from './task-note'
+
+export const relations = defineRelations(
+  { user, project, projectTask, collaborator, taskNote },
+  (r) => ({
+    user: {
+      projects: r.many.project(),
+      taskNotes: r.many.taskNote()
+    },
+    project: {
+      owner: r.one.user({
+        from: r.project.userId,
+        to: r.user.id,
+      }),
+      tasks: r.many.projectTask(),
+    },
+    projectTask: {
+      project: r.one.project({
+        from: r.projectTask.projectId,
+        to: r.project.id,
+      }),
+    },
+    taskNote: {
+      task: r.one.projectTask({
+        from: r.taskNote.taskId,
+        to: r.projectTask.id
+      }),
+      owner: r.one.user({
+        from: r.taskNote.userId,
+        to: r.user.id
+      })
+    },
+  })
+)

@@ -11,6 +11,3 @@ export type GenericErrorCodes =
   | 'NOT_FOUND'
 
 export type ErrorCodes = ProjectErrorCodes | GenericErrorCodes
-
-// export type AuthErrorCodes =
-//   | 'FORBIDDEN'
