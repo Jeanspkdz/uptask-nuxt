@@ -56,7 +56,7 @@ const emit = defineEmits<{
 }>()
 
 const route = useRoute()
-const projectId = route.params.id
+const projectId = route.params.projectId
 
 const addTaskSchema = z.object({
   name: z.string().trim().min(1, { error: 'A task name is required.' }),

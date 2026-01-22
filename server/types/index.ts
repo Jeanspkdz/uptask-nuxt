@@ -12,5 +12,6 @@ export type ProjectUpdate = Pick<ProjectInsert, 'clientName' | 'name' | 'descrip
 
 export type Task = InferSelectModel<typeof projectTaskTable>
 export type TaskInsert = InferInsertModel<typeof projectTaskTable>
+export type TaskUpdate = Partial<Task>
 
 export type TaskState = typeof taskState.enumValues[number]

@@ -37,13 +37,14 @@
 <script setup lang="ts">
 import type { GenericErrorKey } from '~/errors'
 import type { Task } from '~~/server/types'
+import { projectTasksKey } from '~/utils/consts'
 
 definePageMeta({
   layout: 'home-layout',
 })
 
 const route = useRoute()
-const projectId = route.params.id as string
+const projectId = route.params.projectId as string
 
 const {
   project,
@@ -59,6 +60,20 @@ const handleAddNewTask = async (task: Task) => {
   // await refreshProjectTasks()
   projectTasks.value = [...projectTasks.value ?? [], task]
 }
+
+provide(projectTasksKey, {
+  projectTasks,
+  updateProjectTask (id, values) {
+    if (this.projectTasks.value) {
+      this.projectTasks.value = this.projectTasks.value.map(task => {
+        if (task.id === id) {
+          return { ...task, ...values }
+        }
+        return task
+      })
+    }
+  }
+})
 
 </script>
 

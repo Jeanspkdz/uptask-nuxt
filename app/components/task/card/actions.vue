@@ -20,7 +20,7 @@
 
           <DialogTrigger as-child>
             <DropdownMenuItem @select="changeCardModalType('update')">
-              Edit Project
+              Edit Task
             </DropdownMenuItem>
           </DialogTrigger>
 
@@ -29,7 +29,7 @@
               class="text-red-500 hover:text-red-700 focus:text-red-700"
               @select="changeCardModalType('delete')"
             >
-              Delete Project
+              Delete Task
             </DropdownMenuItem>
           </DialogTrigger>
         </DropdownMenuGroup>
@@ -44,6 +44,7 @@
         />
         <TaskModalEdit
           v-else-if="currentCardModalType == 'update'"
+          :task-id="task.id"
           :name="task.name"
           :description="task.description"
         />

@@ -31,7 +31,7 @@ export const ERRORS = {
   }
 } as const satisfies Record<ErrorScopes, { [k:string]: string }>
 
-export function getErrorMessage<Scope extends keyof typeof ERRORS = 'GENERIC'> (scope: Scope, code: GetAllKeys<typeof ERRORS[Scope]>) {
+export function getErrorMessage<Scope extends ErrorScopes = 'GENERIC'> (scope: Scope, code: GetAllKeys<typeof ERRORS[Scope]>) {
   if (ERRORS[scope][code]) {
     return ERRORS[scope][code]
   }
@@ -41,5 +41,5 @@ export function getErrorMessage<Scope extends keyof typeof ERRORS = 'GENERIC'> (
 
 type GetAllKeys<T> = T extends T ? keyof T : never
 
-export type AvailableErrorCodes = GetAllKeys<UnionErrorCodes>
 type UnionErrorCodes = typeof ERRORS[ErrorScopes]
+export type AvailableErrorCodes = GetAllKeys<UnionErrorCodes>

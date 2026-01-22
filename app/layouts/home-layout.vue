@@ -9,7 +9,7 @@
       </div>
     </header>
     <main class="py-7 bg-gray-100/80 flex-1 min-h-full flex">
-      <slot />
+      <slot/>
     </main>
   </div>
 </template>

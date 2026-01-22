@@ -21,13 +21,6 @@ const modelValue = useVModel(props, keyValue, emits, {
   passive: true,
   defaultValue: props.defaultValue,
 })
-
-watchEffect(() => {
-  console.log(keyValue)
-
-  console.log(modelValue.value)
-})
-
 </script>
 
 <template>

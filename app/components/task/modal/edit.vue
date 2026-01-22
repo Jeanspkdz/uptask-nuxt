@@ -11,7 +11,7 @@
             </DialogTitle>
             <DialogDescription as-child>
               <FieldDescription class="font-bold text-lg text-black">
-                Made task changes in
+                Make changes to the task using
                 <span class="text-fuchsia-600">this form</span>
               </FieldDescription>
             </DialogDescription>
@@ -21,10 +21,7 @@
             <VeeField v-slot="{ field, errors }" name="name">
               <Field>
                 <FieldLabel>Task Name</FieldLabel>
-                <Input
-                  placeholder="Your Task Name"
-                  v-bind="field"
-                />
+                <Input placeholder="Your Task Name" v-bind="field" />
                 <FieldError v-if="errors.length" :errors="errors" />
               </Field>
             </VeeField>
@@ -35,6 +32,8 @@
                 <Textarea
                   placeholder="Your Task Description"
                   v-bind="field"
+                  class="resize-none field-sizing-content"
+                  :rows="5"
                 />
                 <FieldError v-if="errors.length" :errors="errors" />
               </Field>
@@ -53,17 +52,24 @@
 <script setup lang="ts">
 import { toTypedSchema } from '@vee-validate/zod'
 import { useForm, Field as VeeField } from 'vee-validate'
+import { toast } from 'vue-sonner'
 import { z } from 'zod'
+import { getErrorMessage } from '~/errors'
 const props = defineProps<{
+  taskId: string
   name: string;
   description: string;
 }>()
+
+const route = useRoute()
+const projectId = route.params.projectId as string
+const projectTasksProvider = inject(projectTasksKey)
 
 const editTaskSchema = z.object({
   name: z.string().min(1, { error: 'A name is required' }),
   description: z
     .string()
-    .min(8, { error: 'A description wiyth 8 length is required' }),
+    .min(8, { error: 'Description must be at least 8 characters long' }),
 })
 
 const { handleSubmit, meta, isSubmitting } = useForm({
@@ -74,8 +80,27 @@ const { handleSubmit, meta, isSubmitting } = useForm({
   },
 })
 
-const handleEditTask = handleSubmit((values) => {
-  console.log('EDIT TASK', values)
+const handleEditTask = handleSubmit(async (values) => {
+  try {
+    await $fetch(`/api/project/${projectId}/task/${props.taskId}`, {
+      method: 'PUT',
+      body: {
+        ...values
+      },
+      ignoreResponseError: true,
+      onResponse ({ response }) {
+        if (response.ok) {
+          toast.success('Task Updated Successfully!!')
+          projectTasksProvider?.updateProjectTask(props.taskId, values)
+          return
+        }
+        toast.error(getErrorMessage(response._data.data.scope, response._data.data.code))
+      },
+    })
+  } catch (error) {
+    console.log('[UPDATE_TASK_ERROR]', error)
+    toast.error(getErrorMessage('GENERIC', 'UNKNOWN'))
+  }
 })
 </script>
 

@@ -5,7 +5,7 @@ export type ErrorDetails<T extends string = string> = {
   message: string
 }
 
-export type ErrorData = ErrorDetails<ErrorCodes> & { reason: string, scope: ErrorScopes }
+export type ErrorData = ErrorDetails<ErrorCodes> & { reason?: string, scope: ErrorScopes }
 
 type GenericErrorDef = {
   [K in GenericErrorCodes]: ErrorDetails<K>

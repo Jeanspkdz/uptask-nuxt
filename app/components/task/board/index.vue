@@ -63,7 +63,7 @@ import { useCloned } from '@vueuse/core'
 import { FetchError } from 'ofetch'
 
 const route = useRoute()
-const projectId = route.params.id
+const projectId = route.params.projectId
 const isSending = ref(false)
 
 const { tasks } = defineProps<{
