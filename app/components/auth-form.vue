@@ -1,10 +1,10 @@
 <template>
   <div class="px-4">
-    <header class="text-white mb-6">
+    <header class="text-white mb-6 mx-auto md:max-w-10/12">
       <slot name="header"/>
     </header>
 
-    <div class="mx-auto bg-white px-6 py-7 w-full md:max-w-10/12 shadow-2xl">
+    <div class="mx-auto bg-white px-4 py-5 md:px-6 md:py-7 w-full md:max-w-10/12 shadow-2xl">
       <slot/>
     </div>
 

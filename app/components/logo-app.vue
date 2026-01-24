@@ -1,11 +1,15 @@
 <template>
-  <div class="w-full sm:w-[300px] md:w-[450px]">
-    <NuxtImg width="450" height="250" src="/logo.svg" class="object-cover w-full"/>
-  </div>
+  <NuxtImg
+    densities="x1 x2"
+    class="w-[350px] sm:w-[400px] md:w-[600px] aspect-[285/100]"
+    sizes="350px sm:400px md:600px"
+    src="/logo.svg"
+    alt="UpTask Logo"
+  />
 </template>
 
 <script setup lang="ts">
-
+//  sizes="250px md:500px"
 </script>
 
 <style scoped></style>
