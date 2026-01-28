@@ -2,7 +2,7 @@
   <section class="max-w-10/12 w-full mx-auto">
     <ProjectError
       v-if="projectError"
-      :error-code="projectError.statusMessage as GenericErrorKey ?? 'UNKNOWN'"
+      :error-code="(projectError.statusMessage as GenericErrorKey) ?? 'UNKNOWN'"
       :error-status-code="projectError.statusCode ?? 400"
     />
 
@@ -17,27 +17,26 @@
         :subtitle="project?.description ?? ''"
       />
 
-      <div class="space-x-2 mt-2.5">
-        <TaskAddButton @task-created="handleAddNewTask" />
-        <Button class="px-6"> Collaborator </Button>
-      </div>
-
-      <div class="mt-8">
-        <h3 class="text-3xl font-black mb-6">Tasks</h3>
-
-        <div v-if="projectTasksPending">
-          <TaskBoardSkeleton/>
+      <TaskProvider v-slot="{pending: tasksPending, tasksByStatus}">
+        <div class="space-x-2 mt-2.5">
+          <ProjectActions/>
         </div>
-        <TaskBoard v-else :tasks="projectTasks ?? []" />
-      </div>
+
+        <div class="mt-8">
+          <h3 class="text-3xl font-black mb-6">Tasks</h3>
+
+          <div v-if="tasksPending">
+            <TaskBoardSkeleton />
+          </div>
+          <TaskBoard v-else :tasks="tasksByStatus" />
+        </div>
+      </TaskProvider>
     </div>
   </section>
 </template>
 
 <script setup lang="ts">
 import type { GenericErrorKey } from '~/errors'
-import type { Task } from '~~/server/types'
-import { projectTasksKey } from '~/utils/consts'
 
 definePageMeta({
   layout: 'home-layout',
@@ -51,29 +50,6 @@ const {
   error: projectError,
   pending: projectPending,
 } = useProject(() => projectId)
-const {
-  projectTasks,
-  pending: projectTasksPending,
-} = useProjectTasks(() => projectId)
-
-const handleAddNewTask = async (task: Task) => {
-  // await refreshProjectTasks()
-  projectTasks.value = [...projectTasks.value ?? [], task]
-}
-
-provide(projectTasksKey, {
-  projectTasks,
-  updateProjectTask (id, values) {
-    if (this.projectTasks.value) {
-      this.projectTasks.value = this.projectTasks.value.map(task => {
-        if (task.id === id) {
-          return { ...task, ...values }
-        }
-        return task
-      })
-    }
-  }
-})
 
 </script>
 

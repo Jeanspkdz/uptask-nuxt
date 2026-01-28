@@ -1,4 +1,4 @@
-import { eq } from 'drizzle-orm'
+import { eq, sql } from 'drizzle-orm'
 import { readValidatedBody } from 'h3'
 import { FetchError } from 'ofetch'
 import { z } from 'zod'
@@ -34,6 +34,10 @@ export default defineEventHandler(async (event) => {
 
     const reorderedTasks = await db.transaction(
       async (tx) => {
+        await tx.execute(
+          sql`SET CONSTRAINTS project_tasks_project_id_order_state_unique DEFERRED`
+        )
+
         const tasksPromise = data.map((pTask) => {
           return tx
             .update(projectTaskTable)
@@ -51,8 +55,8 @@ export default defineEventHandler(async (event) => {
         return results.flat(1)
       },
       {
-        deferrable: true,
-        isolationLevel: 'serializable'
+        deferrable: true, // ??
+        isolationLevel: 'serializable',
       }
     )
 
@@ -60,7 +64,7 @@ export default defineEventHandler(async (event) => {
   } catch (error) {
     if (error instanceof FetchError) {
       throw createError<ErrorData>({
-        ...error
+        ...error,
       })
     }
 
@@ -72,8 +76,8 @@ export default defineEventHandler(async (event) => {
       data: {
         ...GENERIC_ERRORS['UNKNOWN'],
         scope: 'GENERIC',
-        reason: 'An unexpected error ocurred'
-      }
+        reason: 'An unexpected error ocurred',
+      },
     })
   }
 })

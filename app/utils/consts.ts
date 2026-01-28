@@ -1,10 +1,12 @@
 import type { InjectionKey } from 'vue'
-import type { Task, TaskUpdate } from '~~/server/types'
+import type { Task, TaskState, TaskUpdate } from '~~/server/types'
 
-type ProjectTasksKey = {
-  projectTasks: Ref<Task[] | undefined>,
+export type ProjectTasksKey = {
+  projectTasks: Ref<Task[] | undefined>
+  projectTasksByStatus: ComputedRef<Partial<Record<TaskState, Task[]>>>
+  pending: Ref<boolean>
   updateProjectTask: (id: Task['id'], values: TaskUpdate) => void
-  [attributes: string]: unknown
+  addProjectTask: (task: Task) => void
 }
 
 export const projectTasksKey = Symbol('project tasks') as InjectionKey<ProjectTasksKey>

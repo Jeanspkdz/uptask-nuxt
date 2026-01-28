@@ -67,37 +67,35 @@ const projectId = route.params.projectId
 const isSending = ref(false)
 
 const { tasks } = defineProps<{
-  tasks: Task[];
+  tasks: Partial<Record<TaskState, Task[]>>
 }>()
 
 const prevtasksByState = computed(() => {
-  const tasksGroupedByStatus = Object.groupBy(tasks, (task) => task.state)
-
   return {
     pending: {
       label: 'Pending',
       variant: 'pending' as const,
-      tasks: tasksGroupedByStatus.pending || [],
+      tasks: tasks.pending || [],
     },
     waiting: {
       label: 'Waiting',
       variant: 'waiting' as const,
-      tasks: tasksGroupedByStatus.waiting || [],
+      tasks: tasks.waiting || [],
     },
     in_progress: {
       label: 'In Progress',
       variant: 'in_progress' as const,
-      tasks: tasksGroupedByStatus.in_progress || [],
+      tasks: tasks.in_progress || [],
     },
     in_review: {
       label: 'In Review',
       variant: 'in_review' as const,
-      tasks: tasksGroupedByStatus.in_review || [],
+      tasks: tasks.in_review || [],
     },
     completed: {
       label: 'Completed',
       variant: 'completed' as const,
-      tasks: tasksGroupedByStatus.completed || [],
+      tasks: tasks.completed || [],
     },
   }
 })
@@ -178,6 +176,7 @@ watch(
     sync()
   }
 )
+
 </script>
 
 <style scoped>

@@ -34,23 +34,11 @@
       </DialogHeader>
 
       <Label class="mt-7 font-bold">Current State</Label>
-      <Select v-model="taskNewState" class="">
-        <SelectTrigger class="mt-3 w-full mb-4">
-          <SelectValue placeholder="Update the task state" />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectGroup>
-            <SelectLabel>States</SelectLabel>
-            <SelectItem
-              v-for="(label, key) in taskStates"
-              :key="key"
-              :value="key"
-            >
-              {{ label }}
-            </SelectItem>
-          </SelectGroup>
-        </SelectContent>
-      </Select>
+      <TaskStateSelect
+        :task-state="taskDetails.state"
+        :task-id="taskDetails.id"
+        @task-state-updated="handleUpdateTaskState"
+      />
 
       <form @submit="handleCreateNote">
         <VeeField v-slot="{ field, errors }" name="noteName">
@@ -76,22 +64,12 @@ import { useForm, Field as VeeField } from 'vee-validate'
 import z from 'zod'
 import type { Task, TaskState } from '~~/server/types'
 
-const props = defineProps<{
+defineProps<{
   taskDetails: Pick<
     Task,
-    'name' | 'state' | 'createdAt' | 'updatedAt' | 'description'
+    'id' | 'name' | 'state' | 'createdAt' | 'updatedAt' | 'description'
   >;
 }>()
-
-const taskNewState = ref(props.taskDetails.state)
-
-const taskStates: Record<TaskState, string> = {
-  pending: 'Pending',
-  waiting: 'Waiting',
-  in_progress: 'In Progress',
-  in_review: 'In Review',
-  completed: 'Completed',
-}
 
 const createNoteSchema = toTypedSchema(
   z.object({
@@ -112,6 +90,13 @@ const { handleSubmit, meta } = useForm({
 const handleCreateNote = handleSubmit((val) => {
   console.log(val)
 })
+
+const projectTasksProvider = inject(projectTasksKey)
+
+const handleUpdateTaskState = (taskId: string, state: TaskState, order: number) => {
+  projectTasksProvider?.updateProjectTask(taskId, { state, order })
+}
+
 </script>
 
 <style scoped></style>
