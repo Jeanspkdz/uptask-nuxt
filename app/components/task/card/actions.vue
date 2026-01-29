@@ -32,6 +32,9 @@
               Delete Task
             </DropdownMenuItem>
           </DialogTrigger>
+          <!-- <DropdownMenuItem as-child>
+            <TaskModalDelete/>
+          </DropdownMenuItem> -->
         </DropdownMenuGroup>
       </DropdownMenuContent>
     </DropdownMenu>
@@ -48,7 +51,11 @@
           :name="task.name"
           :description="task.description"
         />
-        <div v-else>Nani??</div>
+        <div v-else>
+          <TaskModalDelete
+            :task-id="task.id"
+          />
+        </div>
       </div>
     </DialogContent>
   </Dialog>

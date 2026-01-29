@@ -78,10 +78,6 @@ export default defineEventHandler(async (event) => {
 
   const validatedBody = validatedBodyResult.data
 
-  console.log('PUT', {
-    validatedBody,
-  })
-
   const taskUpdated = await db.update(projectTaskTable).set(validatedBody).where(eq(projectTaskTable.id, taskId))
 
   return {

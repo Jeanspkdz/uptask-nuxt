@@ -7,6 +7,7 @@ export type ProjectTasksKey = {
   pending: Ref<boolean>
   updateProjectTask: (id: Task['id'], values: TaskUpdate) => void
   addProjectTask: (task: Task) => void
+  deleteProjectTask: (taskId: Task['id']) => void
 }
 
 export const projectTasksKey = Symbol('project tasks') as InjectionKey<ProjectTasksKey>

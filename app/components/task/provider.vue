@@ -55,6 +55,9 @@ provide(projectTasksKey, {
   addProjectTask (task) {
     projectTasks.value?.push(task)
   },
+  deleteProjectTask (taskId) {
+    projectTasks.value = projectTasks.value?.filter(task => task.id !== taskId)
+  }
 })
 </script>
 

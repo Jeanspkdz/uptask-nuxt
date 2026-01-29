@@ -5,8 +5,8 @@
     </DialogTrigger>
 
     <DialogContent>
-      <DialogTitle class="text-2xl font-black">New Task</DialogTitle>
-      <DialogDescription class="font-extrabold text-black -mt-3">
+      <DialogTitle class="text-2xl font-bold">New Task</DialogTitle>
+      <DialogDescription class="font-bold text-black -mt-3">
         Fill out the form and create
         <span class="text-fuchsia-600">a new task</span>
       </DialogDescription>
@@ -59,8 +59,14 @@ const route = useRoute()
 const projectId = route.params.projectId
 
 const addTaskSchema = z.object({
-  name: z.string().trim().min(1, { error: 'A task name is required.' }),
-  description: z.string().trim().min(1, { error: 'A description is required.' })
+  name: z
+    .string({ message: 'A task name is required.' })
+    .trim()
+    .min(4, { message: 'Task name must be at least 4 characters long.' }),
+  description: z
+    .string({ message: 'A description is required.' })
+    .trim()
+    .min(10, { message: 'Description must be at least 10 characters long.' })
 })
 
 const { handleSubmit, isSubmitting, meta } = useForm({
