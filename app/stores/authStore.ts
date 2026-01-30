@@ -8,7 +8,6 @@ export const useAuthStore = defineStore('authStore', () => {
   async function getUserSession () {
     const { data, error: errorResponse } = await authClient.useSession(useFetch)
     if (errorResponse) error.value = errorResponse
-
     user.value = data.value?.user
   }
 
