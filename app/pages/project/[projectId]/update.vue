@@ -1,5 +1,5 @@
 <template>
-  <section class="max-w-10/12 mx-auto">
+  <section class="max-w-10/12 mx-auto min-h-full my-auto">
     <ProjectError
       v-if="error"
       :error-code="error.statusMessage as GenericErrorKey ?? 'UNKNOWN'"
@@ -95,9 +95,9 @@ definePageMeta({
   layout: 'home-layout',
 })
 const route = useRoute()
-const id = route.params.id
+const projectId = route.params.projectId
 
-const { data, error } = await useFetch<Project>(`/api/project/${id}`)
+const { data, error } = await useFetch<Project>(`/api/project/${projectId}`)
 
 const updateProjectSchema = z.object({
   name: z
@@ -122,7 +122,7 @@ const { isSubmitting, handleSubmit, meta } = useForm({
 
 const handleUpdateProject = handleSubmit(async (values, actions) => {
   try {
-    await $fetch(`/api/project/${id}`, {
+    await $fetch(`/api/project/${projectId}`, {
       method: 'PUT',
       body: {
         ...values,
