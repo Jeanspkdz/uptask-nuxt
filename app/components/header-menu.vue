@@ -1,6 +1,6 @@
 <template>
   <DropdownMenu>
-    <DropdownMenuTrigger>
+    <DropdownMenuTrigger as-child>
       <button class="hover:cursor-pointer bg-violet-400 p-1">
         <Menu class="text-white" width="16" height="16" />
       </button>
@@ -22,8 +22,8 @@
         </DropdownMenuItem>
         <DropdownMenuItem @select="handleLogOut">
           <logOut />
-          Log Out</DropdownMenuItem
-        >
+          Log Out
+        </DropdownMenuItem>
       </DropdownMenuGroup>
     </DropdownMenuContent>
   </DropdownMenu>

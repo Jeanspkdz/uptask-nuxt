@@ -1,10 +1,15 @@
 <template>
     <TaskAddButton @task-created="handleAddNewTask" />
-    <Button class="px-6"> Collaborator </Button>
+    <NuxtLink as-child :to="`/project/${projectId}/team`">
+      <Button class="px-6"> Collaborator </Button>
+    </NuxtLink>
 </template>
 
 <script setup lang="ts">
 import type { Task } from '~~/server/types'
+
+const route = useRoute()
+const projectId = route.params.projectId
 
 const tasksProvider = inject(projectTasksKey)
 

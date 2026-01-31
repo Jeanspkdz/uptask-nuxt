@@ -16,6 +16,7 @@ export const relations = defineRelations(
       owner: r.one.user({
         from: r.project.userId,
         to: r.user.id,
+        optional: false
       }),
       tasks: r.many.projectTask(),
     },
