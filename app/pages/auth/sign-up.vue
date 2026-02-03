@@ -19,6 +19,7 @@
 
               <FormControl>
                 <Input
+                  autocomplete="email"
                   type="email"
                   placeholder="Enter your email"
                   v-bind="componentField"
@@ -38,6 +39,7 @@
 
               <FormControl>
                 <Input
+                  autocomplete="username"
                   type="text"
                   placeholder="Enter your username"
                   v-bind="componentField"
@@ -57,6 +59,7 @@
 
               <FormControl>
                 <Input
+                  autocomplete="new-password"
                   type="password"
                   placeholder="Enter your password"
                   v-bind="componentField"
@@ -76,6 +79,7 @@
 
               <FormControl>
                 <Input
+                  autocomplete="new-password"
                   type="password"
                   placeholder="Repeat your password"
                   v-bind="componentField"
@@ -110,7 +114,7 @@ import { toTypedSchema } from '@vee-validate/zod'
 import { useForm } from 'vee-validate'
 import { toast } from 'vue-sonner'
 import z from 'zod'
-import { getAuthErrorMessage } from '~/errors/auth'
+import { getErrorMessage } from '~/errors'
 import { authClient } from '~/lib/auth'
 
 definePageMeta({
@@ -130,9 +134,13 @@ const signUpSchema = z
     error: "Passwords don't match",
     path: ['confirmPassword'],
     when (payload) {
-      return signUpSchema
-        .pick({ password: true, confirmPassword: true })
-        .safeParse(payload.value).success
+      // return signUpSchema
+      //   .pick({ password: true, confirmPassword: true })
+      //   .safeParse(payload.value).success
+      return payload.issues.every((iss) => {
+        const firstPathEl = iss.path?.[0]
+        return firstPathEl !== 'password' && firstPathEl !== 'confirmPassword'
+      })
     },
   })
 
@@ -172,7 +180,8 @@ const handleSingUp = handleSubmit(async ({ email, username, password }, actions)
       },
       onError (context) {
         console.log('OnError', context)
-        toast.error(getAuthErrorMessage(context.error.code))
+        // toast.error(getAuthErrorMessage(context.error.code))
+        toast.error(getErrorMessage('AUTH', context.error.code))
       },
     }
   )

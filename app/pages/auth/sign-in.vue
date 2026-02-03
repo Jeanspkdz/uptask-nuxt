@@ -19,6 +19,7 @@
 
               <FormControl>
                 <Input
+                  autocomplete="email"
                   type="email"
                   placeholder="Enter your email"
                   v-bind="componentField"
@@ -38,6 +39,7 @@
 
               <FormControl>
                 <Input
+                  autocomplete="current-password"
                   type="password"
                   placeholder="Enter your password"
                   v-bind="componentField"
