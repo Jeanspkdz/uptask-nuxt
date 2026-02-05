@@ -13,6 +13,7 @@ export const useAuthStore = defineStore('authStore', () => {
 
   return {
     user,
+    error,
     getUserSession
   }
 })

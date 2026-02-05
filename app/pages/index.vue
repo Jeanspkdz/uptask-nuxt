@@ -8,9 +8,9 @@
       <NuxtLink to="/project/create"> Add new project </NuxtLink>
     </Button>
 
-    <div v-if="data && data?.length > 0" class="space-y-4 mt-6">
+    <div v-if="projects && projects.length > 0" class="space-y-4 mt-6">
       <NuxtLink
-        v-for="{ projects: project } in data"
+        v-for="project in projects"
         :key="project.id"
         class="block"
         :to="`/project/${project.id}`"
@@ -37,12 +37,11 @@ definePageMeta({
 
 const authStore = useAuthStore()
 
-const { data } = await useFetch<
-  {
-    users: User;
-    projects: Project;
-  }[]
->('/api/project')
+const { data: projects } = await useFetch<Project[]>('/api/project')
+
+watchEffect(() => {
+  console.log('DATA ', projects.value)
+})
 
 function getUserRoleForProject (projectUserId: string): UserRole {
   return authStore.user?.id === projectUserId ? 'manager' : 'collaborator'

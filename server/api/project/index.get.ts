@@ -1,5 +1,4 @@
 import { eq } from 'drizzle-orm'
-import { userTable } from '~~/server/db/schema/auth-schema'
 import { projectTable } from '~~/server/db/schema/project'
 import { GENERIC_ERRORS } from '~~/server/errors'
 import type { User } from '~~/server/types'
@@ -13,8 +12,16 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  const proyectsByUser = await db.select().from(projectTable).innerJoin(userTable, eq(projectTable.userId, userTable.id))
-  // db.select().from(project).where(eq(project.userId, userAuthenticated.id))
+  const projectsByUser = await db
+    .select()
+    .from(projectTable)
+    .where(eq(projectTable.userId, userAuthenticated.id))
 
-  return proyectsByUser
+  // const projectsByUser = await db.query.project.findMany({
+  //   with: {
+  //     tasks: true
+  //   }
+  // })
+
+  return projectsByUser
 })

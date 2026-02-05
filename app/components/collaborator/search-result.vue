@@ -7,14 +7,11 @@
       <h3 class="font-semibold text-center">Results:</h3>
       <ul>
         <li v-for="user in foundUsers" :key="user.id" class="">
-          <div class="flex justify-between space-y-2">
-            <span>{{ user.email }}</span>
-            <Button
-              variant="ghost"
-              class="bg-purple-200/75 text-purple-600 hover:bg-purple-300 hover:text-purple-600 hover:cursor-pointer transition-colors"
-            >
-              Add to project
-            </Button>
+          <div class="space-y-2">
+            <CollaboratorSearchListItem
+              :user-email="user.email"
+              :user-id="user.id"
+            />
           </div>
         </li>
       </ul>
@@ -28,6 +25,7 @@ import type { User } from '~~/server/types'
 defineProps<{
   foundUsers: User[];
 }>()
+
 </script>
 
 <style scoped></style>
