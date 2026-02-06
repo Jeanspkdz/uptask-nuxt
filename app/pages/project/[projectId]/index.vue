@@ -18,7 +18,7 @@
       />
 
       <TaskProvider v-slot="{pending: tasksPending, tasksByStatus}">
-        <div class="space-x-2 mt-2.5">
+        <div v-if="project && isProjectOwner(project.userId)" class="space-x-2 mt-2.5">
           <ProjectActions/>
         </div>
 
@@ -50,6 +50,8 @@ const {
   error: projectError,
   pending: projectPending,
 } = useProject(() => projectId)
+
+const { isProjectOwner } = useAuthStore()
 
 </script>
 

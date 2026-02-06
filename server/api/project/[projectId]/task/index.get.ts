@@ -1,6 +1,5 @@
 import { asc, eq } from 'drizzle-orm'
 import z from 'zod'
-import { projectTable } from '~~/server/db/schema/project'
 import { projectTaskTable } from '~~/server/db/schema/project-task'
 import type { ErrorData } from '~~/server/errors'
 import { GENERIC_ERRORS } from '~~/server/errors'
@@ -19,19 +18,6 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  // Check if the user owns the project
-  const [projectFound] = await db
-    .select()
-    .from(projectTable)
-    .where(eq(projectTable.userId, userAuthenticated.id))
-
-  if (!projectFound) {
-    throw createError({
-      statusCode: 403,
-      statusMessage: GENERIC_ERRORS['UNAUTHORIZED']['code'],
-    })
-  }
-
   const validatedRouterParams = await getValidatedRouterParams(
     event,
     routerParamValidator.safeParse
@@ -43,13 +29,39 @@ export default defineEventHandler(async (event) => {
       statusMessage: GENERIC_ERRORS['BAD_REQUEST']['code'],
       data: {
         ...GENERIC_ERRORS['BAD_REQUEST'],
-        reason: z.prettifyError(validatedRouterParams.error),
         scope: 'GENERIC'
       }
     })
   }
 
   const { projectId } = validatedRouterParams.data
+
+  // Check if the user is either the owner or a collaborator of the project
+  const project = await db.query.project.findFirst({
+    where: {
+      AND: [
+        { id: projectId },
+        {
+          OR: [
+            { userId: userAuthenticated.id },
+            {
+              collaborator: {
+                id: userAuthenticated.id
+              }
+            }
+          ]
+        }
+      ]
+    }
+
+  })
+
+  if (!project) {
+    throw createError({
+      statusCode: 403,
+      statusMessage: GENERIC_ERRORS['UNAUTHORIZED']['code'],
+    })
+  }
 
   const tasks = await db
     .select()

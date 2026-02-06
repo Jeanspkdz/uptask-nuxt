@@ -9,7 +9,8 @@ export const relations = defineRelations(
   { user, project, projectTask, collaborator, taskNote },
   (r) => ({
     user: {
-      projects: r.many.project({ alias: 'project' }),
+      ownedProjects: r.many.project({ alias: 'project' }),
+      collaboratorProjects: r.many.project({ alias: 'collaborators' }),
       taskNotes: r.many.taskNote(),
     },
     project: {
