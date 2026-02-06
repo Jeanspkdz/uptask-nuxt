@@ -3,7 +3,7 @@ import type { ErrorData } from '~~/server/errors'
 import { GENERIC_ERRORS } from '~~/server/errors'
 import type { User } from '~~/server/types'
 
-const routerParamValidator = z.object({
+const routeParamValidator = z.object({
   projectId: z.cuid2({ error: 'Invalid format' }),
 })
 
@@ -16,26 +16,26 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  const validatedRouterParams = await getValidatedRouterParams(
+  const routeParamsValidationResult = await getValidatedRouterParams(
     event,
-    routerParamValidator.safeParse
+    routeParamValidator.safeParse
   )
 
-  if (!validatedRouterParams.success) {
+  if (!routeParamsValidationResult.success) {
     throw createError<ErrorData>({
       statusCode: 400,
       statusMessage: GENERIC_ERRORS['BAD_REQUEST']['code'],
       data: {
         ...GENERIC_ERRORS['BAD_REQUEST'],
-        reason: z.prettifyError(validatedRouterParams.error),
+        reason: z.prettifyError(routeParamsValidationResult.error),
         scope: 'GENERIC',
       },
     })
   }
 
-  const { projectId } = validatedRouterParams.data
+  const { projectId } = routeParamsValidationResult.data
 
-  const [project] = await db.query.project.findMany({
+  const [projectWithCollaborator] = await db.query.project.findMany({
     columns: {},
     with: {
       collaborator: true,
@@ -45,5 +45,19 @@ export default defineEventHandler(async (event) => {
     },
   })
 
-  return project?.collaborator
+  if (!projectWithCollaborator) {
+    throw createError<ErrorData>({
+      statusCode: 404,
+      statusMessage: GENERIC_ERRORS['NOT_FOUND']['code'],
+      data: {
+        ...GENERIC_ERRORS['NOT_FOUND'],
+        reason: 'The requested project could not be found in the database',
+        scope: 'GENERIC',
+      },
+    })
+  }
+
+  return {
+    collaborator: projectWithCollaborator.collaborator
+  }
 })

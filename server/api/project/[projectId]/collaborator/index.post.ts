@@ -5,9 +5,11 @@ import { projectTable } from '~~/server/db/schema/project'
 import type { ErrorData } from '~~/server/errors'
 import { GENERIC_ERRORS } from '~~/server/errors'
 import type { User } from '~~/server/types'
+import { routeParamsSchema } from '~~/server/utils/validator'
 
-const routerParamValidator = z.object({
-  projectId: z.cuid2({ error: 'Invalid format' }),
+const routeParamValidator = routeParamsSchema.pick({
+  projectId: true,
+  taskId: true,
 })
 const routerBodyValidator = z.object({
   userId: z.string(),
@@ -22,24 +24,23 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  const validatedRouterParams = await getValidatedRouterParams(
+  const routeParamsValidationResult = await getValidatedRouterParams(
     event,
-    routerParamValidator.safeParse
+    routeParamValidator.safeParse
   )
 
-  if (!validatedRouterParams.success) {
+  if (!routeParamsValidationResult.success) {
     throw createError<ErrorData>({
       statusCode: 400,
       statusMessage: GENERIC_ERRORS['BAD_REQUEST']['code'],
       data: {
         ...GENERIC_ERRORS['BAD_REQUEST'],
-        reason: z.prettifyError(validatedRouterParams.error),
         scope: 'GENERIC',
       },
     })
   }
 
-  const { projectId } = validatedRouterParams.data
+  const { projectId } = routeParamsValidationResult.data
 
   const [project] = await db
     .select()
@@ -62,12 +63,12 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  const validatedBody = await readValidatedBody(
+  const routeBodyValidationResult = await readValidatedBody(
     event,
     routerBodyValidator.safeParse
   )
 
-  if (!validatedBody.success) {
+  if (!routeBodyValidationResult.success) {
     throw createError<ErrorData>({
       statusCode: 400,
       statusMessage: GENERIC_ERRORS['BAD_REQUEST']['code'],
@@ -78,14 +79,17 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  const { userId } = validatedBody.data
+  const { userId } = routeBodyValidationResult.data
 
-  const [collab] = await db.insert(collaboratorTable).values({
-    userId,
-    projectId
-  }).returning()
+  const [collaborator] = await db
+    .insert(collaboratorTable)
+    .values({
+      userId,
+      projectId,
+    })
+    .returning()
 
   return {
-    collab
+    collaborator,
   }
 })

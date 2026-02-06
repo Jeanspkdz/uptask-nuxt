@@ -44,7 +44,6 @@
 
 <script setup lang="ts">
 import type { UserRole } from '@/components/project/card/index.vue'
-import type { Project } from '@@/server/types/index'
 
 definePageMeta({
   layout: 'home-layout',

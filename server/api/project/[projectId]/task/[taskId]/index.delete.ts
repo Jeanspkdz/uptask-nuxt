@@ -1,14 +1,14 @@
 import { and, eq, gt } from 'drizzle-orm'
-import z from 'zod'
 import { projectTable } from '~~/server/db/schema/project'
 import { projectTaskTable } from '~~/server/db/schema/project-task'
 import type { ErrorData } from '~~/server/errors'
 import { GENERIC_ERRORS } from '~~/server/errors'
 import type { User } from '~~/server/types'
+import { routeParamsSchema } from '~~/server/utils/validator'
 
-const routerParamsValidator = z.object({
-  projectId: z.string(),
-  taskId: z.string(),
+const routerParamsValidator = routeParamsSchema.pick({
+  projectId: true,
+  taskId: true,
 })
 
 export default defineEventHandler(async (event) => {
@@ -67,26 +67,28 @@ export default defineEventHandler(async (event) => {
       .where(eq(projectTaskTable.id, taskId))
       .returning()
 
-    // Reorder task from the source column
-    const subsequentTasks = await tx
-      .select()
-      .from(projectTaskTable)
-      .where(
-        and(
-          eq(projectTaskTable.projectId, projectId),
-          eq(projectTaskTable.state, deletedTransactionTask.state),
-          gt(projectTaskTable.order, deletedTransactionTask.order)
+    if (deletedTransactionTask) {
+      // Reorder task from the source column
+      const subsequentTasks = await tx
+        .select()
+        .from(projectTaskTable)
+        .where(
+          and(
+            eq(projectTaskTable.projectId, projectId),
+            eq(projectTaskTable.state, deletedTransactionTask.state),
+            gt(projectTaskTable.order, deletedTransactionTask.order)
+          )
         )
-      )
 
-    const tasksPromise = subsequentTasks.map(async (task) => {
-      return await tx
-        .update(projectTaskTable)
-        .set({ order: task.order - 1 })
-        .where(eq(projectTaskTable.id, task.id))
-        .returning()
-    })
-    await Promise.all(tasksPromise)
+      const tasksPromise = subsequentTasks.map(async (task) => {
+        return await tx
+          .update(projectTaskTable)
+          .set({ order: task.order - 1 })
+          .where(eq(projectTaskTable.id, task.id))
+          .returning()
+      })
+      await Promise.all(tasksPromise)
+    }
 
     return deletedTransactionTask
   })

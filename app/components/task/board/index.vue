@@ -55,7 +55,6 @@
 
 <script setup lang="ts">
 import { VueDraggable, type DraggableEvent } from 'vue-draggable-plus'
-import type { Task } from '~~/server/types'
 import type { TaskState } from './column-header.vue'
 import { toast } from 'vue-sonner'
 import { getErrorMessage } from '~/errors'
@@ -67,7 +66,7 @@ const projectId = route.params.projectId
 const isSending = ref(false)
 
 const { tasks } = defineProps<{
-  tasks: Partial<Record<TaskState, Task[]>>
+  tasks: Partial<Record<TaskState, ProjectTask[]>>
 }>()
 
 const prevtasksByState = computed(() => {

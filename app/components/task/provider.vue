@@ -7,14 +7,13 @@
 </template>
 
 <script setup lang="ts">
-import type { TaskState, Task } from '~~/server/types'
 
 const route = useRoute()
 const projectId = route.params.projectId as string
 
 const { projectTasks, pending } = useProjectTasks(() => projectId)
 
-const projectTasksByStatus = computed<Partial<Record<TaskState, Task[]>>>(() => {
+const projectTasksByStatus = computed<Partial<Record<TaskState, ProjectTask[]>>>(() => {
   if (pending.value || projectTasks.value === undefined) {
     return {}
   }
@@ -28,7 +27,7 @@ const projectTasksByStatus = computed<Partial<Record<TaskState, Task[]>>>(() => 
       const tasksSorted = value.toSorted((a, b) => a.order - b.order)
       return [key as TaskState, tasksSorted]
     })
-  ) as Record<TaskState, Task[]>
+  ) as Record<TaskState, ProjectTask[]>
 
   return orderedGropuedTasks
 })

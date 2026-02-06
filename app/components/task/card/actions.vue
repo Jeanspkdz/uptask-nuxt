@@ -64,14 +64,13 @@
 <script setup lang="ts">
 import { TaskModalDetail, TaskModalEdit } from '#components'
 import { EllipsisVertical } from 'lucide-vue-next'
-import type { Task } from '~~/server/types'
 
 defineOptions({
   inheritAttrs: false
 })
 
 defineProps<{
-  task: Task;
+  task: ProjectTask;
 }>()
 
 type CardModalTypes = 'delete' | 'update' | 'detail'

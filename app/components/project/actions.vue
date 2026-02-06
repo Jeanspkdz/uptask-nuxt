@@ -6,14 +6,13 @@
 </template>
 
 <script setup lang="ts">
-import type { Task } from '~~/server/types'
 
 const route = useRoute()
 const projectId = route.params.projectId
 
 const tasksProvider = inject(projectTasksKey)
 
-const handleAddNewTask = (task: Task) => {
+const handleAddNewTask = (task: ProjectTask) => {
   tasksProvider?.addProjectTask(task)
 }
 

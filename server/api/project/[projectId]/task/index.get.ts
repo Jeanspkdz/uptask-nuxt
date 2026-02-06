@@ -1,13 +1,11 @@
 import { asc, eq } from 'drizzle-orm'
-import z from 'zod'
 import { projectTaskTable } from '~~/server/db/schema/project-task'
 import type { ErrorData } from '~~/server/errors'
 import { GENERIC_ERRORS } from '~~/server/errors'
 import type { User } from '~~/server/types'
+import { routeParamsSchema } from '~~/server/utils/validator'
 
-const routerParamValidator = z.object({
-  projectId: z.cuid2({ error: 'Invalid format' }),
-})
+const routerParamValidator = routeParamsSchema.pick({ projectId: true })
 
 export default defineEventHandler(async (event) => {
   const userAuthenticated: User = event.context.auth
@@ -18,12 +16,12 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  const validatedRouterParams = await getValidatedRouterParams(
+  const routerParamValidationResult = await getValidatedRouterParams(
     event,
     routerParamValidator.safeParse
   )
 
-  if (!validatedRouterParams.success) {
+  if (!routerParamValidationResult.success) {
     throw createError<ErrorData>({
       statusCode: 400,
       statusMessage: GENERIC_ERRORS['BAD_REQUEST']['code'],
@@ -34,9 +32,9 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  const { projectId } = validatedRouterParams.data
+  const { projectId } = routerParamValidationResult.data
 
-  // Check if the user is either the owner or a collaborator of the project
+  // Check if the user is either the owner or a project's collaborator
   const project = await db.query.project.findFirst({
     where: {
       AND: [
@@ -57,9 +55,13 @@ export default defineEventHandler(async (event) => {
   })
 
   if (!project) {
-    throw createError({
+    throw createError<ErrorData>({
       statusCode: 403,
       statusMessage: GENERIC_ERRORS['UNAUTHORIZED']['code'],
+      data: {
+        ...GENERIC_ERRORS['UNAUTHORIZED'],
+        scope: 'GENERIC'
+      }
     })
   }
 

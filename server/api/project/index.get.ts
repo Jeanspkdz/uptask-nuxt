@@ -1,5 +1,4 @@
 import { GENERIC_ERRORS } from '~~/server/errors'
-import type { User } from '~~/server/types'
 
 export default defineEventHandler(async (event) => {
   const userAuthenticated: User = event.context.auth

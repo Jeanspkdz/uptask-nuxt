@@ -33,7 +33,6 @@
 
 <script setup lang="ts">
 import { EllipsisVertical } from 'lucide-vue-next'
-import type { Project } from '~~/server/types'
 
 defineProps<{ projectId: Project['id'] }>()
 </script>

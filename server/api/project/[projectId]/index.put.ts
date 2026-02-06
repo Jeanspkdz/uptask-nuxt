@@ -3,7 +3,14 @@ import { projectTable } from '~~/server/db/schema/project'
 import type { ErrorData } from '~~/server/errors'
 import { GENERIC_ERRORS } from '~~/server/errors'
 import { PROJECT_ERRORS } from '~~/server/errors/project'
-import type { ProjectUpdate, User } from '~~/server/types'
+import type { User } from '~~/server/types'
+import {
+  projectSelectSchema,
+  routeParamsSchema
+} from '~~/server/utils/validator'
+
+const routeParamValidator = routeParamsSchema.pick({ projectId: true })
+const routeBodyValidator = projectSelectSchema.pick({ clientName: true, name: true, description: true })
 
 export default defineEventHandler(async (event) => {
   const userAuthenticated: User = event.context.auth
@@ -14,24 +21,28 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  const id = getRouterParam(event, 'projectId')
+  const routeParamsValidationResult = await getValidatedRouterParams(
+    event,
+    routeParamValidator.safeParse
+  )
 
-  if (!id) {
+  if (!routeParamsValidationResult.success) {
     throw createError<ErrorData>({
       statusCode: 400,
       statusMessage: GENERIC_ERRORS['BAD_REQUEST']['code'],
       data: {
-        ...GENERIC_ERRORS['BAD_REQUEST'],
-        reason: 'Missing required parameter',
         scope: 'GENERIC',
+        ...GENERIC_ERRORS['BAD_REQUEST'],
       },
     })
   }
 
+  const { projectId } = routeParamsValidationResult.data
+
   const [projectFound] = await db
     .select()
     .from(projectTable)
-    .where(eq(projectTable.id, id))
+    .where(eq(projectTable.id, projectId))
 
   if (!projectFound) {
     throw createError<ErrorData>({
@@ -58,14 +69,33 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  const data = (await readBody(event)) as ProjectUpdate
+  const routeBodyValidationResult = await readValidatedBody(
+    event,
+    routeBodyValidator.safeParse
+  )
+
+  if (!routeBodyValidationResult.success) {
+    throw createError<ErrorData>({
+      statusCode: 400,
+      statusMessage: GENERIC_ERRORS['BAD_REQUEST']['code'],
+      data: {
+        scope: 'GENERIC',
+        ...GENERIC_ERRORS['BAD_REQUEST'],
+      },
+    })
+  }
+
+  const { name, clientName, description } = routeBodyValidationResult.data
 
   // Check if an project with the name and ClientName already exists
   const foundProject = await db
     .select()
     .from(projectTable)
     .where(
-      and(eq(projectTable.name, data.name), eq(projectTable.clientName, data.clientName))
+      and(
+        eq(projectTable.name, name),
+        eq(projectTable.clientName, clientName)
+      )
     )
 
   if (foundProject.length > 0) {
@@ -81,15 +111,17 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  const [projectUpdated] = await db
+  const [updatedProject] = await db
     .update(projectTable)
     .set({
-      clientName: data.clientName,
-      name: data.name,
-      description: data.description,
+      clientName,
+      name,
+      description,
     })
-    .where(eq(projectTable.id, id))
+    .where(eq(projectTable.id, projectId))
     .returning()
 
-  return projectUpdated
+  return {
+    updatedProject
+  }
 })

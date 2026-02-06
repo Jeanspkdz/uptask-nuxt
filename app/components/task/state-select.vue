@@ -26,7 +26,6 @@
 <script setup lang="ts">
 import { toast } from 'vue-sonner'
 import { getErrorMessage } from '~/errors'
-import type { TaskState } from '~~/server/types'
 
 const props = defineProps<{
   taskState: TaskState,

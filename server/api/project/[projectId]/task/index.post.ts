@@ -1,8 +1,13 @@
 import { and, eq } from 'drizzle-orm'
 import { projectTable } from '~~/server/db/schema/project'
 import { projectTaskTable } from '~~/server/db/schema/project-task'
+import type { ErrorData } from '~~/server/errors'
 import { GENERIC_ERRORS } from '~~/server/errors'
-import type { TaskInsert, User } from '~~/server/types'
+import type { User } from '~~/server/types'
+import { routeParamsSchema } from '~~/server/utils/validator'
+
+const routerParamValidator = routeParamsSchema.pick({ projectId: true })
+const routeBodyValidator = projectTaskInsertSchema.clone()
 
 export default defineEventHandler(async (event) => {
   const userAuthenticated: User = event.context.auth
@@ -13,7 +18,23 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  const projectId = getRouterParam(event, 'projectId') as string
+  const routerParamValidationResult = await getValidatedRouterParams(
+    event,
+    routerParamValidator.safeParse
+  )
+
+  if (!routerParamValidationResult.success) {
+    throw createError<ErrorData>({
+      statusCode: 400,
+      statusMessage: GENERIC_ERRORS['BAD_REQUEST']['code'],
+      data: {
+        ...GENERIC_ERRORS['BAD_REQUEST'],
+        scope: 'GENERIC',
+      },
+    })
+  }
+
+  const { projectId } = routerParamValidationResult.data
 
   // Check if the user owns the project
   const [projectFound] = await db
@@ -29,23 +50,44 @@ export default defineEventHandler(async (event) => {
   }
 
   // Add new task
-  const data = (await readBody(event)) as TaskInsert
-  data['projectId'] = projectId
+  const routeBodyValidationResult = await readValidatedBody(
+    event,
+    routeBodyValidator.safeParse
+  )
 
-  const lastOrder = await db.$count(
-    projectTaskTable,
-    and(eq(projectTaskTable.projectId, projectId), eq(projectTaskTable.state, 'pending'))
-  ) + 1
+  if (!routeBodyValidationResult.success) {
+    throw createError<ErrorData>({
+      statusCode: 400,
+      statusMessage: GENERIC_ERRORS['BAD_REQUEST']['code'],
+      data: {
+        ...GENERIC_ERRORS['BAD_REQUEST'],
+        scope: 'GENERIC',
+      },
+    })
+  }
 
-  const [taskInserted] = await db
+  const { name, description } = routeBodyValidationResult.data
+
+  const lastOrder =
+    (await db.$count(
+      projectTaskTable,
+      and(
+        eq(projectTaskTable.projectId, projectId),
+        eq(projectTaskTable.state, 'pending')
+      )
+    )) + 1
+
+  const [insertedTask] = await db
     .insert(projectTaskTable)
     .values({
-      name: data.name,
-      description: data.description,
-      projectId: data.projectId,
+      name,
+      description,
+      projectId,
       order: lastOrder,
     })
     .returning()
 
-  return taskInserted
+  return {
+    insertedTask
+  }
 })

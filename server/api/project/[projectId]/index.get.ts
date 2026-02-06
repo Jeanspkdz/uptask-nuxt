@@ -3,6 +3,9 @@ import { projectTable } from '~~/server/db/schema/project'
 import type { ErrorData } from '~~/server/errors'
 import { GENERIC_ERRORS } from '~~/server/errors'
 import type { User } from '~~/server/types'
+import { routeParamsSchema } from '~~/server/utils/validator'
+
+const routeParamValidator = routeParamsSchema.pick({ projectId: true })
 
 export default defineEventHandler(async (event) => {
   const userAuthenticated: User = event.context.auth
@@ -13,33 +16,42 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  const id = getRouterParam(event, 'projectId')
+  const routeParamsValidationResult = await getValidatedRouterParams(
+    event,
+    routeParamValidator.safeParse
+  )
 
-  if (!id) {
+  if (!routeParamsValidationResult.success) {
     throw createError<ErrorData>({
       statusCode: 400,
       statusMessage: GENERIC_ERRORS['BAD_REQUEST']['code'],
       data: {
+        scope: 'GENERIC',
         ...GENERIC_ERRORS['BAD_REQUEST'],
-        reason: 'Missing required parameter',
-        scope: 'GENERIC'
       }
     })
   }
 
-  const projectFound = await db.select().from(projectTable).where(eq(projectTable.id, id))
+  const { projectId } = routeParamsValidationResult.data
 
-  if (projectFound.length === 0) {
+  const [projectFound] = await db
+    .select()
+    .from(projectTable)
+    .where(eq(projectTable.id, projectId))
+
+  if (!projectFound) {
     throw createError<ErrorData>({
       statusCode: 404,
       statusMessage: GENERIC_ERRORS['NOT_FOUND']['code'],
       data: {
         ...GENERIC_ERRORS['NOT_FOUND'],
         reason: 'The requested project could not be found in the database',
-        scope: 'GENERIC'
-      }
+        scope: 'GENERIC',
+      },
     })
   }
 
-  return projectFound.at(0)
+  return {
+    project: projectFound
+  }
 })

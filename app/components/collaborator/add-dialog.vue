@@ -48,7 +48,6 @@ import { Search } from 'lucide-vue-next'
 import { Field as VeeField } from 'vee-validate'
 import { toast } from 'vue-sonner'
 import { getErrorMessage } from '~/errors'
-import type { User } from '~~/server/types'
 
 const foundUsers = ref<User[] | null>(null)
 

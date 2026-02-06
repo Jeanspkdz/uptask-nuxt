@@ -5,15 +5,15 @@ import { z } from 'zod'
 import { projectTaskTable } from '~~/server/db/schema/project-task'
 import type { ErrorData } from '~~/server/errors'
 import { GENERIC_ERRORS } from '~~/server/errors'
-import { projectTaskReorderShape } from '~~/server/utils/validator'
+import { projectTaskReorderSchema } from '~~/server/utils/validator'
 
-const routerBodyValidator = z.array(projectTaskReorderShape)
+const routeBodyValidator = z.array(projectTaskReorderSchema)
 
 export default defineEventHandler(async (event) => {
   try {
     const validatedBody = await readValidatedBody(
       event,
-      routerBodyValidator.safeParse
+      routeBodyValidator.safeParse
     )
 
     if (!validatedBody.success) {
@@ -62,13 +62,13 @@ export default defineEventHandler(async (event) => {
 
     return reorderedTasks
   } catch (error) {
+    console.log('[RERORDER_TASKS_ERROR]', error)
+
     if (error instanceof FetchError) {
       throw createError<ErrorData>({
         ...error,
       })
     }
-
-    console.log('[RERORDER_TASKS_ERROR]', error)
 
     throw createError<ErrorData>({
       statusCode: 500,

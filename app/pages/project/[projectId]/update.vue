@@ -88,8 +88,6 @@ import {
   getErrorMessage,
   type GenericErrorKey
 } from '~/errors'
-import type { ErrorData } from '~~/server/errors'
-import type { Project } from '~~/server/types'
 
 definePageMeta({
   layout: 'home-layout',
@@ -136,7 +134,7 @@ const handleUpdateProject = handleSubmit(async (values, actions) => {
           })
           return
         }
-        const errorData = response._data.data as ErrorData
+        const errorData = response._data.data
         toast.error(getErrorMessage(errorData.scope, errorData.code))
       },
     })

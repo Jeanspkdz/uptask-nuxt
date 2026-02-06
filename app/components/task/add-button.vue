@@ -48,11 +48,8 @@ import { toast } from 'vue-sonner'
 import z from 'zod'
 import { getErrorMessage } from '~/errors'
 
-import type { ErrorData } from '~~/server/errors'
-import type { Task } from '~~/server/types'
-
 const emit = defineEmits<{
-  taskCreated: [task: Task]
+  taskCreated: [task: ProjectTask]
 }>()
 
 const route = useRoute()
@@ -95,7 +92,7 @@ const handleAddNewTask = (closeDialog: () => void) => {
             emit('taskCreated', response._data)
             return
           }
-          const errorData = response._data.data as ErrorData
+          const errorData = response._data.data
           toast.error(getErrorMessage(errorData.scope, errorData.code))
         }
       })

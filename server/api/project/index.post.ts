@@ -1,33 +1,66 @@
 import { and, eq } from 'drizzle-orm'
 import { projectTable } from '~~/server/db/schema/project'
+import type { ErrorData } from '~~/server/errors'
 import { GENERIC_ERRORS } from '~~/server/errors'
 import { PROJECT_ERRORS } from '~~/server/errors/project'
-import type { User, ProjectInsert } from '~~/server/types'
+import type { User } from '~~/server/types'
+import { projectInsertchema } from '~~/server/utils/validator'
+
+const routeBodyValidator = projectInsertchema.pick({
+  name: true,
+  clientName: true,
+  description: true,
+})
 
 export default defineEventHandler(async (event) => {
   const userAuthenticated: User = event.context.auth
   if (!userAuthenticated) {
     throw createError({
       statusCode: 401,
-      statusMessage: GENERIC_ERRORS['UNAUTHORIZED']['code']
+      statusMessage: GENERIC_ERRORS['UNAUTHORIZED']['code'],
     })
   }
-  const data = (await readBody(event)) as ProjectInsert
+  const bodyValidationResult = await readValidatedBody(
+    event,
+    routeBodyValidator.safeParse
+  )
 
-  // Check if an project with the name and ClientName already exists
-  const foundProject = await db.select().from(projectTable).where(and(eq(projectTable.name, data.name), eq(projectTable.clientName, data.clientName)))
-
-  if (foundProject.length > 0) {
-    throw createError({
+  if (!bodyValidationResult.success) {
+    throw createError<ErrorData>({
       statusCode: 400,
-      statusMessage: PROJECT_ERRORS['NAME_AND_CLIENT_NAME_ALREADY_EXISTS']['code'],
+      statusMessage: GENERIC_ERRORS['BAD_REQUEST']['code'],
       data: {
-        ...PROJECT_ERRORS['NAME_AND_CLIENT_NAME_ALREADY_EXISTS'],
+        scope: 'GENERIC',
+        ...GENERIC_ERRORS['BAD_REQUEST'],
       }
     })
   }
 
-  const projectInserted = await db
+  const { data } = bodyValidationResult
+
+  // Check if an project with the name and ClientName already exists
+  const foundProject = await db
+    .select()
+    .from(projectTable)
+    .where(
+      and(
+        eq(projectTable.name, data.name),
+        eq(projectTable.clientName, data.clientName)
+      )
+    )
+
+  if (foundProject.length > 0) {
+    throw createError({
+      statusCode: 400,
+      statusMessage:
+        PROJECT_ERRORS['NAME_AND_CLIENT_NAME_ALREADY_EXISTS']['code'],
+      data: {
+        ...PROJECT_ERRORS['NAME_AND_CLIENT_NAME_ALREADY_EXISTS'],
+      },
+    })
+  }
+
+  const insertedProject = await db
     .insert(projectTable)
     .values({
       clientName: data.clientName,
@@ -38,6 +71,6 @@ export default defineEventHandler(async (event) => {
     .returning()
 
   return {
-    data: projectInserted,
+    insertedProject,
   }
 })

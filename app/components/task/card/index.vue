@@ -20,10 +20,9 @@
 </template>
 
 <script setup lang="ts">
-import type { Task } from '~~/server/types'
 
 defineProps<{
-  task: Task;
+  task: ProjectTask;
 }>()
 </script>
 

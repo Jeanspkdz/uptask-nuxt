@@ -20,7 +20,6 @@
 </template>
 
 <script setup lang="ts">
-import type { User } from '~~/server/types'
 
 defineProps<{
   foundUsers: User[];

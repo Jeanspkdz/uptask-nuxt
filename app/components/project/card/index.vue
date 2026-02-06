@@ -27,7 +27,6 @@
 </template>
 
 <script setup lang="ts">
-import type { Project } from '~~/server/types'
 
 // types
 export type UserRole = 'manager' | 'collaborator'

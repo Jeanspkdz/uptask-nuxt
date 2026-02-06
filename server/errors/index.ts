@@ -1,14 +1,14 @@
 import type { ErrorCodes, ErrorScopes, GenericErrorCodes } from '#shared/types/error'
 
-export type ErrorDetails<T extends string = string> = {
-  code: T,
-  message: string
-}
-
 export type ErrorData = ErrorDetails<ErrorCodes> & { reason?: string, scope: ErrorScopes }
 
 type GenericErrorDef = {
   [K in GenericErrorCodes]: ErrorDetails<K>
+}
+
+export type ErrorDetails<T extends string = string> = {
+  code: T,
+  message: string
 }
 
 export const GENERIC_ERRORS = {
