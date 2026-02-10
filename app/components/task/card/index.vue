@@ -9,6 +9,7 @@
       </h4>
       <TaskCardActions
         :task="task"
+        :user-role="userRole"
         class="absolute top-0 right-0"
       />
     </div>
@@ -20,9 +21,11 @@
 </template>
 
 <script setup lang="ts">
+import type { UserRole } from '~/components/project/card/index.vue'
 
 defineProps<{
   task: ProjectTask;
+  userRole: UserRole
 }>()
 </script>
 

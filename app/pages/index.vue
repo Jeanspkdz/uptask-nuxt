@@ -8,7 +8,7 @@
       <NuxtLink to="/project/create"> Add new project </NuxtLink>
     </Button>
 
-    <div v-if="projects && !pending" class="space-y-4 mt-6">
+    <div v-if="projects && !isProjectsPending" class="space-y-4 mt-6">
       <NuxtLink
         v-for="ownedProject in projects.ownedProjects"
         :key="ownedProject.id"
@@ -20,7 +20,7 @@
           :title="ownedProject.name"
           :client-name="ownedProject.clientName"
           :description="ownedProject.description"
-          :role="getUserRoleForProject(ownedProject.userId)"
+          :role="ownedProject.projectRole"
         />
       </NuxtLink>
 
@@ -35,7 +35,7 @@
           :title="collaboratorProject.name"
           :client-name="collaboratorProject.clientName"
           :description="collaboratorProject.description"
-          :role="getUserRoleForProject(collaboratorProject.userId)"
+          :role="collaboratorProject.projectRole"
         />
       </NuxtLink>
     </div>
@@ -43,29 +43,16 @@
 </template>
 
 <script setup lang="ts">
-import type { UserRole } from '@/components/project/card/index.vue'
 
 definePageMeta({
   layout: 'home-layout',
 })
 
-type ProjectsResponse = {
-  ownedProjects: Project[];
-  collaboratorProjects: Project[];
-}
-
-const authStore = useAuthStore()
-
-const { data: projects, pending } =
-  await useFetch<ProjectsResponse>('/api/project')
-
+const { projects, isProjectsPending } = useProjects()
 watchEffect(() => {
   console.log(projects.value)
 })
 
-function getUserRoleForProject (projectUserId: string): UserRole {
-  return authStore.user?.id === projectUserId ? 'manager' : 'collaborator'
-}
 </script>
 
 <style scoped></style>

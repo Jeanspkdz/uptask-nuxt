@@ -2,7 +2,7 @@
   <section class="max-w-10/12 w-full mx-auto">
     <ProjectError
       v-if="projectError"
-      :error-code="(projectError.statusMessage as GenericErrorKey) ?? 'UNKNOWN'"
+      :error-code="projectError.statusMessage ?? 'UNKNOWN'"
       :error-status-code="projectError.statusCode ?? 400"
     />
 
@@ -17,18 +17,21 @@
         :subtitle="project?.description ?? ''"
       />
 
-      <TaskProvider v-slot="{pending: tasksPending, tasksByStatus}">
-        <div v-if="project" class="space-x-2 mt-2.5">
-          <ProjectActions/>
-        </div>
+      <TaskProvider v-slot="{ pending: tasksPending, tasksByStatus }">
+        <ProjectActions
+          v-if="project && project.userRole === 'manager'"
+          class="space-x-2 mt-2.5"
+        />
 
         <div class="mt-8">
           <h3 class="text-3xl font-black mb-6">Tasks</h3>
 
-          <div v-if="tasksPending">
-            <TaskBoardSkeleton />
-          </div>
-          <TaskBoard v-else :tasks="tasksByStatus" />
+          <TaskBoardSkeleton v-if="tasksPending" />
+          <TaskBoard
+            v-else-if="project"
+            :tasks="tasksByStatus"
+            :user-role="project.userRole"
+          />
         </div>
       </TaskProvider>
     </div>
@@ -36,8 +39,6 @@
 </template>
 
 <script setup lang="ts">
-import type { GenericErrorKey } from '~/errors'
-
 definePageMeta({
   layout: 'home-layout',
 })
@@ -45,12 +46,7 @@ definePageMeta({
 const route = useRoute()
 const projectId = route.params.projectId as string
 
-const {
-  project,
-  projectError,
-  isProjectLoading,
-} = useProject(() => projectId)
-
+const { project, projectError, isProjectLoading } = useProject(() => projectId)
 </script>
 
 <style scoped></style>

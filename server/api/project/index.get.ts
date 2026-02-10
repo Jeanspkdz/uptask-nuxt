@@ -17,5 +17,9 @@ export default defineEventHandler(async (event) => {
     }
   })
 
+  if (!userRelatedProjects) {
+    throw createCustomError('GENERIC', 'NOT_FOUND')
+  }
+
   return userRelatedProjects
 })

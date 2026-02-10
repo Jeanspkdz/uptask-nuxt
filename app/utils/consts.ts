@@ -6,7 +6,7 @@ export type ProjectTasksKey = {
   pending: Ref<boolean>;
   updateProjectTask: (
     id: ProjectTask['id'],
-    values: Omit<ProjectTask, 'id' | 'projectId'>,
+    values: Partial<Omit<ProjectTask, 'id' | 'projectId'>>,
   ) => void;
   addProjectTask: (task: ProjectTask) => void;
   deleteProjectTask: (taskId: ProjectTask['id']) => void;

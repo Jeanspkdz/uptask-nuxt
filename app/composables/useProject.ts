@@ -1,7 +1,7 @@
+import type { UserRole } from '~/components/project/card/index.vue'
+
 export const useProject = (projectId: MaybeRefOrGetter<string>) => {
-  type ProjectResponse = {
-    project: Project;
-  }
+  const authStore = useAuthStore()
 
   const {
     data,
@@ -9,10 +9,20 @@ export const useProject = (projectId: MaybeRefOrGetter<string>) => {
     pending: isProjectLoading,
     refresh,
     status,
-  } = useFetch<ProjectResponse>(() => `/api/project/${toValue(projectId)}`)
+  } = useFetch(() => `/api/project/${toValue(projectId)}`, {
+    transform ({ project }) {
+      const userRole: UserRole =
+        authStore.user?.id === project.userId ? 'manager' : 'collaborator'
 
-  const project = computed(() => data.value?.project)
+      return {
+        ...project,
+        userRole
+      }
+    },
+    lazy: true
+  })
 
+  const project = computed(() => data.value)
   return {
     project,
     isProjectLoading,

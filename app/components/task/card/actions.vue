@@ -3,7 +3,7 @@
     <DropdownMenu data-not-draggable>
       <DropdownMenuTrigger as-child>
         <Button variant="ghost" :class="$attrs.class">
-          <EllipsisVertical class="size-[20px]" />
+          <EllipsisVertical class="size-5" />
         </Button>
       </DropdownMenuTrigger>
 
@@ -18,13 +18,13 @@
             </DropdownMenuItem>
           </DialogTrigger>
 
-          <DialogTrigger as-child>
+          <DialogTrigger v-if="userRole === 'manager'" as-child>
             <DropdownMenuItem @select="changeCardModalType('update')">
               Edit Task
             </DropdownMenuItem>
           </DialogTrigger>
 
-          <DialogTrigger as-child>
+          <DialogTrigger v-if="userRole === 'manager'" as-child>
             <DropdownMenuItem
               class="text-red-500 hover:text-red-700 focus:text-red-700"
               @select="changeCardModalType('delete')"
@@ -32,9 +32,7 @@
               Delete Task
             </DropdownMenuItem>
           </DialogTrigger>
-          <!-- <DropdownMenuItem as-child>
-            <TaskModalDelete/>
-          </DropdownMenuItem> -->
+
         </DropdownMenuGroup>
       </DropdownMenuContent>
     </DropdownMenu>
@@ -64,6 +62,7 @@
 <script setup lang="ts">
 import { TaskModalDetail, TaskModalEdit } from '#components'
 import { EllipsisVertical } from 'lucide-vue-next'
+import type { UserRole } from '~/components/project/card/index.vue'
 
 defineOptions({
   inheritAttrs: false
@@ -71,6 +70,7 @@ defineOptions({
 
 defineProps<{
   task: ProjectTask;
+  userRole: UserRole
 }>()
 
 type CardModalTypes = 'delete' | 'update' | 'detail'

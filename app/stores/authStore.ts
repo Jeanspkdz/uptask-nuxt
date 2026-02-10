@@ -11,10 +11,15 @@ export const useAuthStore = defineStore('authStore', () => {
     user.value = data.value?.user
   }
 
+  const isProjectOwner = (projectUserId: string) => {
+    return user.value?.id === projectUserId
+  }
+
   return {
     user,
     error,
-    getUserSession
+    getUserSession,
+    isProjectOwner
   }
 })
 

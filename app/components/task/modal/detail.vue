@@ -37,7 +37,7 @@
       <TaskStateSelect
         :task-state="taskDetails.state"
         :task-id="taskDetails.id"
-        @task-state-updated="handleUpdateTaskState"
+        @task-state-change="handleUpdateTaskState"
       />
 
       <form @submit="handleCreateNote">

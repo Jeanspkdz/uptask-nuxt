@@ -16,10 +16,29 @@ export const useProjectTasks = (projectId: MaybeRefOrGetter<string>) => {
     deep: true
   })
 
+  const projectTasksByStatus = computed<
+    Partial<Record<TaskState, ProjectTask[]>>
+  >(() => {
+    if (isProjectTasksLoading.value || projectTasks.value === undefined) {
+      return {}
+    }
+    const groupedTasks = Object.groupBy(projectTasks.value, (task) => task.state)
+
+    const orderedGropuedTasks = Object.fromEntries(
+      Object.entries(groupedTasks).map(([key, value]) => {
+        const tasksSorted = value.toSorted((a, b) => a.order - b.order)
+        return [key as TaskState, tasksSorted]
+      })
+    ) as Record<TaskState, ProjectTask[]>
+
+    return orderedGropuedTasks
+  })
+
   return {
     refresh,
     clear,
     projectTasks,
+    projectTasksByStatus,
     isProjectTasksLoading,
     projectTasksError,
   }

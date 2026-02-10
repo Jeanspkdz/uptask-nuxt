@@ -37,6 +37,7 @@
             v-for="item in val.tasks"
             :key="item.id"
             :task="item"
+            :user-role="userRole"
             class="select-none"
           />
         </VueDraggable>
@@ -60,6 +61,7 @@ import { toast } from 'vue-sonner'
 import { getErrorMessage } from '~/errors'
 import { useCloned } from '@vueuse/core'
 import { FetchError } from 'ofetch'
+import type { UserRole } from '~/components/project/card/index.vue'
 
 const route = useRoute()
 const projectId = route.params.projectId
@@ -67,6 +69,7 @@ const isSending = ref(false)
 
 const { tasks } = defineProps<{
   tasks: Partial<Record<TaskState, ProjectTask[]>>
+  userRole: UserRole
 }>()
 
 const prevtasksByState = computed(() => {

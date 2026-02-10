@@ -15,13 +15,14 @@
           <NuxtLink :to="`/project/${projectId}`"> Go to project </NuxtLink>
         </DropdownMenuItem>
 
-        <DropdownMenuItem as-child>
+        <DropdownMenuItem v-if="isOwnerProject" as-child>
           <NuxtLink :to="`/project/${projectId}/update`">
             Edit Project
           </NuxtLink>
         </DropdownMenuItem>
 
         <DropdownMenuItem
+          v-if="isOwnerProject"
           class="text-red-500 hover:text-red-700 focus:text-red-700"
         >
           Delete Project
@@ -33,8 +34,11 @@
 
 <script setup lang="ts">
 import { EllipsisVertical } from 'lucide-vue-next'
+import type { UserRole } from './index.vue'
 
-defineProps<{ projectId: Project['id'] }>()
+const props = defineProps<{ projectId: Project['id']; role: UserRole }>()
+
+const isOwnerProject = computed(() => props.role === 'manager')
 </script>
 
 <style scoped></style>

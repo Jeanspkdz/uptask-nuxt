@@ -1,8 +1,10 @@
 <template>
-    <TaskAddButton @task-created="handleAddNewTask" />
+   <div>
+     <TaskAddButton @task-created="handleAddNewTask" />
     <NuxtLink as-child :to="`/project/${projectId}/team`">
       <Button class="px-6"> Collaborator </Button>
     </NuxtLink>
+   </div>
 </template>
 
 <script setup lang="ts">

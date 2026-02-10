@@ -32,7 +32,7 @@ const props = defineProps<{
   taskId: string
 }>()
 const emit = defineEmits<{
-  taskStateUpdated: [taskId: string, state: TaskState, order: number]
+  taskStateChange: [taskId: string, state: TaskState, order: number]
 }>()
 
 const projectTasksProvider = inject(projectTasksKey)
@@ -82,7 +82,7 @@ const handleUpdateTaskState = async (state: TaskState | null) => {
       onResponse ({ response }) {
         if (response.ok) {
           toast.success('Task State Updated Sucessfully')
-          emit('taskStateUpdated', props.taskId, state, lastTaskOrder)
+          emit('taskStateChange', props.taskId, state, lastTaskOrder)
           return
         }
         toast.error(
