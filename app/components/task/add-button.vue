@@ -87,9 +87,11 @@ const handleAddNewTask = (closeDialog: () => void) => {
         onResponse ({ response }) {
           if (response.ok) {
             toast.success('Task Created Successfully!!')
+            console.log(response)
+
             actions.resetForm()
             closeDialog()
-            emit('taskCreated', response._data)
+            emit('taskCreated', response._data.insertedTask)
             return
           }
           const errorData = response._data.data

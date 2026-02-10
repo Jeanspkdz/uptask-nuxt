@@ -7,7 +7,7 @@
     />
 
     <div v-else>
-      <div v-if="projectPending" class="animate-pulse">
+      <div v-if="isProjectLoading" class="animate-pulse">
         <div class="h-10 bg-gray-200 rounded w-1/3 mb-2" />
         <div class="h-6 bg-gray-200 rounded w-2/3" />
       </div>
@@ -18,7 +18,7 @@
       />
 
       <TaskProvider v-slot="{pending: tasksPending, tasksByStatus}">
-        <div v-if="project && isProjectOwner(project.userId)" class="space-x-2 mt-2.5">
+        <div v-if="project" class="space-x-2 mt-2.5">
           <ProjectActions/>
         </div>
 
@@ -47,11 +47,9 @@ const projectId = route.params.projectId as string
 
 const {
   project,
-  error: projectError,
-  pending: projectPending,
+  projectError,
+  isProjectLoading,
 } = useProject(() => projectId)
-
-const { isProjectOwner } = useAuthStore()
 
 </script>
 

@@ -77,7 +77,7 @@ import { toTypedSchema } from '@vee-validate/zod'
 import { useForm } from 'vee-validate'
 import { toast } from 'vue-sonner'
 import { z } from 'zod'
-import { GENERIC_ERROR_MESSAGES } from '~/errors'
+import { getErrorMessage } from '~/errors'
 import { getAuthErrorMessage } from '~/errors/auth'
 import { authClient } from '~/lib/auth'
 
@@ -111,7 +111,7 @@ const handleLogin = handleSubmit(async data => {
       callbackURL: '/'
     })
   } catch (error) {
-    toast.error(GENERIC_ERROR_MESSAGES['UNKNOWN'])
+    toast.error(getErrorMessage('GENERIC', 'UNKNOWN'))
     console.log(error)
   }
 })

@@ -5,20 +5,24 @@
       subtitle="Organize and oversee your project team"
     />
 
-    <div class="flex gap-x-2 mt-5 mb-5">
+    <div class="flex gap-x-2 mt-5 mb-7">
       <CollaboratorAddDialog />
       <Button variant="default" @click="$router.back">Go Back</Button>
     </div>
 
-    <div v-if="!pending && collaborators && collaborators.length > 0">
-      <CollaboratorCard
+    <div v-if="isCollaboratorsLoading">
+        <CollaboratorCardSkeleton v-for="value in 5" :key="value" />
+
+    </div>
+    <div v-else-if="collaborators && collaborators?.length > 0">
+     <CollaboratorCard
         v-for="collaborator in collaborators"
         :key="collaborator.id"
         :collaborator="collaborator"
       />
     </div>
-    <div v-else>
-      <CollaboratorCardSkeleton v-for="value in 5" :key="value" />
+    <div v-else-if="collaborators?.length === 0">
+      You don't have collaboratros yet.
     </div>
   </div>
 </template>
@@ -29,15 +33,9 @@ definePageMeta({
 })
 
 const route = useRoute()
-const projectId = route.params.projectId
-const {
-  data: collaborators,
-  pending,
-} = useFetch(`/api/project/${projectId}/collaborator`, { lazy: true })
+const projectId = route.params.projectId as string
+const { collaborators, isCollaboratorsLoading } = useCollaborator(() => projectId)
 
-watchEffect(() => {
-  console.log('DATA', collaborators.value)
-})
 </script>
 
 <style scoped></style>

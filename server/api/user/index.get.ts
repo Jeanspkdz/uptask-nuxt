@@ -1,7 +1,7 @@
 import { and, ilike, ne } from 'drizzle-orm'
 import { userTable } from '~~/server/db/schema/auth-schema'
 import type { ErrorData } from '~~/server/errors'
-import { GENERIC_ERRORS } from '~~/server/errors'
+import { GENERIC_ERRORS } from '~~/server/errors/generic'
 import type { User } from '~~/server/types'
 import { userSelectSchema } from '~~/server/utils/validator'
 

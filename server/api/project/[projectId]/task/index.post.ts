@@ -1,21 +1,20 @@
 import { and, eq } from 'drizzle-orm'
 import { projectTable } from '~~/server/db/schema/project'
 import { projectTaskTable } from '~~/server/db/schema/project-task'
-import type { ErrorData } from '~~/server/errors'
-import { GENERIC_ERRORS } from '~~/server/errors'
+import { createCustomError } from '~~/server/errors'
 import type { User } from '~~/server/types'
 import { routeParamsSchema } from '~~/server/utils/validator'
 
 const routerParamValidator = routeParamsSchema.pick({ projectId: true })
-const routeBodyValidator = projectTaskInsertSchema.clone()
+const routeBodyValidator = projectTaskInsertSchema.pick({
+  name: true,
+  description: true,
+})
 
 export default defineEventHandler(async (event) => {
   const userAuthenticated: User = event.context.auth
   if (!userAuthenticated) {
-    throw createError({
-      statusCode: 401,
-      statusMessage: GENERIC_ERRORS['UNAUTHORIZED']['code'],
-    })
+    throw createCustomError('GENERIC', 'UNAUTHORIZED')
   }
 
   const routerParamValidationResult = await getValidatedRouterParams(
@@ -24,14 +23,7 @@ export default defineEventHandler(async (event) => {
   )
 
   if (!routerParamValidationResult.success) {
-    throw createError<ErrorData>({
-      statusCode: 400,
-      statusMessage: GENERIC_ERRORS['BAD_REQUEST']['code'],
-      data: {
-        ...GENERIC_ERRORS['BAD_REQUEST'],
-        scope: 'GENERIC',
-      },
-    })
+    throw createCustomError('GENERIC', 'BAD_REQUEST')
   }
 
   const { projectId } = routerParamValidationResult.data
@@ -43,10 +35,7 @@ export default defineEventHandler(async (event) => {
     .where(eq(projectTable.userId, userAuthenticated.id))
 
   if (!projectFound) {
-    throw createError({
-      statusCode: 403,
-      statusMessage: GENERIC_ERRORS['UNAUTHORIZED']['code'],
-    })
+    throw createCustomError('GENERIC', 'FORBIDDEN')
   }
 
   // Add new task
@@ -56,14 +45,7 @@ export default defineEventHandler(async (event) => {
   )
 
   if (!routeBodyValidationResult.success) {
-    throw createError<ErrorData>({
-      statusCode: 400,
-      statusMessage: GENERIC_ERRORS['BAD_REQUEST']['code'],
-      data: {
-        ...GENERIC_ERRORS['BAD_REQUEST'],
-        scope: 'GENERIC',
-      },
-    })
+    throw createCustomError('GENERIC', 'BAD_REQUEST')
   }
 
   const { name, description } = routeBodyValidationResult.data
@@ -88,6 +70,6 @@ export default defineEventHandler(async (event) => {
     .returning()
 
   return {
-    insertedTask
+    insertedTask,
   }
 })

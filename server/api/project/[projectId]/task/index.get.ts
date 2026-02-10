@@ -1,7 +1,6 @@
 import { asc, eq } from 'drizzle-orm'
 import { projectTaskTable } from '~~/server/db/schema/project-task'
-import type { ErrorData } from '~~/server/errors'
-import { GENERIC_ERRORS } from '~~/server/errors'
+import { createCustomError } from '~~/server/errors'
 import type { User } from '~~/server/types'
 import { routeParamsSchema } from '~~/server/utils/validator'
 
@@ -10,10 +9,7 @@ const routerParamValidator = routeParamsSchema.pick({ projectId: true })
 export default defineEventHandler(async (event) => {
   const userAuthenticated: User = event.context.auth
   if (!userAuthenticated) {
-    throw createError({
-      statusCode: 401,
-      statusMessage: GENERIC_ERRORS['UNAUTHORIZED']['code'],
-    })
+    throw createCustomError('GENERIC', 'UNAUTHORIZED')
   }
 
   const routerParamValidationResult = await getValidatedRouterParams(
@@ -22,14 +18,7 @@ export default defineEventHandler(async (event) => {
   )
 
   if (!routerParamValidationResult.success) {
-    throw createError<ErrorData>({
-      statusCode: 400,
-      statusMessage: GENERIC_ERRORS['BAD_REQUEST']['code'],
-      data: {
-        ...GENERIC_ERRORS['BAD_REQUEST'],
-        scope: 'GENERIC'
-      }
-    })
+    throw createCustomError('GENERIC', 'BAD_REQUEST')
   }
 
   const { projectId } = routerParamValidationResult.data
@@ -55,14 +44,7 @@ export default defineEventHandler(async (event) => {
   })
 
   if (!project) {
-    throw createError<ErrorData>({
-      statusCode: 403,
-      statusMessage: GENERIC_ERRORS['UNAUTHORIZED']['code'],
-      data: {
-        ...GENERIC_ERRORS['UNAUTHORIZED'],
-        scope: 'GENERIC'
-      }
-    })
+    throw createCustomError('GENERIC', 'FORBIDDEN')
   }
 
   const tasks = await db

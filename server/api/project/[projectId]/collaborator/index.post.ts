@@ -2,15 +2,14 @@ import { and, eq } from 'drizzle-orm'
 import z from 'zod'
 import { collaboratorTable } from '~~/server/db/schema/collaborator'
 import { projectTable } from '~~/server/db/schema/project'
-import type { ErrorData } from '~~/server/errors'
-import { GENERIC_ERRORS } from '~~/server/errors'
+import { createCustomError } from '~~/server/errors'
 import type { User } from '~~/server/types'
 import { routeParamsSchema } from '~~/server/utils/validator'
 
 const routeParamValidator = routeParamsSchema.pick({
   projectId: true,
-  taskId: true,
 })
+
 const routerBodyValidator = z.object({
   userId: z.string(),
 })
@@ -18,10 +17,7 @@ const routerBodyValidator = z.object({
 export default defineEventHandler(async (event) => {
   const userAuthenticated: User = event.context.auth
   if (!userAuthenticated) {
-    throw createError({
-      statusCode: 401,
-      statusMessage: GENERIC_ERRORS['UNAUTHORIZED']['code'],
-    })
+    throw createCustomError('GENERIC', 'UNAUTHORIZED')
   }
 
   const routeParamsValidationResult = await getValidatedRouterParams(
@@ -30,14 +26,7 @@ export default defineEventHandler(async (event) => {
   )
 
   if (!routeParamsValidationResult.success) {
-    throw createError<ErrorData>({
-      statusCode: 400,
-      statusMessage: GENERIC_ERRORS['BAD_REQUEST']['code'],
-      data: {
-        ...GENERIC_ERRORS['BAD_REQUEST'],
-        scope: 'GENERIC',
-      },
-    })
+    throw createCustomError('GENERIC', 'BAD_REQUEST')
   }
 
   const { projectId } = routeParamsValidationResult.data
@@ -53,14 +42,7 @@ export default defineEventHandler(async (event) => {
     )
 
   if (!project) {
-    throw createError<ErrorData>({
-      statusCode: 400,
-      statusMessage: GENERIC_ERRORS['FORBIDDEN']['code'],
-      data: {
-        ...GENERIC_ERRORS['FORBIDDEN'],
-        scope: 'GENERIC',
-      },
-    })
+    throw createCustomError('GENERIC', 'BAD_REQUEST')
   }
 
   const routeBodyValidationResult = await readValidatedBody(
@@ -69,14 +51,7 @@ export default defineEventHandler(async (event) => {
   )
 
   if (!routeBodyValidationResult.success) {
-    throw createError<ErrorData>({
-      statusCode: 400,
-      statusMessage: GENERIC_ERRORS['BAD_REQUEST']['code'],
-      data: {
-        ...GENERIC_ERRORS['BAD_REQUEST'],
-        scope: 'GENERIC',
-      },
-    })
+    throw createCustomError('GENERIC', 'BAD_REQUEST')
   }
 
   const { userId } = routeBodyValidationResult.data

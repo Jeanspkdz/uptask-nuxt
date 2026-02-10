@@ -1,8 +1,6 @@
 import { and, eq } from 'drizzle-orm'
 import { projectTable } from '~~/server/db/schema/project'
-import type { ErrorData } from '~~/server/errors'
-import { GENERIC_ERRORS } from '~~/server/errors'
-import { PROJECT_ERRORS } from '~~/server/errors/project'
+import { createCustomError } from '~~/server/errors'
 import type { User } from '~~/server/types'
 import { projectInsertchema } from '~~/server/utils/validator'
 
@@ -15,10 +13,7 @@ const routeBodyValidator = projectInsertchema.pick({
 export default defineEventHandler(async (event) => {
   const userAuthenticated: User = event.context.auth
   if (!userAuthenticated) {
-    throw createError({
-      statusCode: 401,
-      statusMessage: GENERIC_ERRORS['UNAUTHORIZED']['code'],
-    })
+    throw createCustomError('GENERIC', 'UNAUTHORIZED')
   }
   const bodyValidationResult = await readValidatedBody(
     event,
@@ -26,14 +21,7 @@ export default defineEventHandler(async (event) => {
   )
 
   if (!bodyValidationResult.success) {
-    throw createError<ErrorData>({
-      statusCode: 400,
-      statusMessage: GENERIC_ERRORS['BAD_REQUEST']['code'],
-      data: {
-        scope: 'GENERIC',
-        ...GENERIC_ERRORS['BAD_REQUEST'],
-      }
-    })
+    throw createCustomError('GENERIC', 'BAD_REQUEST')
   }
 
   const { data } = bodyValidationResult
@@ -50,14 +38,7 @@ export default defineEventHandler(async (event) => {
     )
 
   if (foundProject.length > 0) {
-    throw createError({
-      statusCode: 400,
-      statusMessage:
-        PROJECT_ERRORS['NAME_AND_CLIENT_NAME_ALREADY_EXISTS']['code'],
-      data: {
-        ...PROJECT_ERRORS['NAME_AND_CLIENT_NAME_ALREADY_EXISTS'],
-      },
-    })
+    throw createCustomError('PROJECT', 'NAME_AND_CLIENT_NAME_ALREADY_EXISTS')
   }
 
   const insertedProject = await db

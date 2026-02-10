@@ -1,5 +1,8 @@
 export const useProjectTasks = (projectId: MaybeRefOrGetter<string>) => {
-  const { data: projectTasks, error, pending, refresh, clear } = useFetch(`/api/project/${toValue(projectId)}/task`, {
+  const {
+    data: projectTasks, error: projectTasksError, pending: isProjectTasksLoading
+    , refresh, clear
+  } = useFetch(`/api/project/${toValue(projectId)}/task`, {
     transform (tasks) {
       return tasks.map((task) => {
         return {
@@ -17,7 +20,7 @@ export const useProjectTasks = (projectId: MaybeRefOrGetter<string>) => {
     refresh,
     clear,
     projectTasks,
-    pending,
-    error,
+    isProjectTasksLoading,
+    projectTasksError,
   }
 }

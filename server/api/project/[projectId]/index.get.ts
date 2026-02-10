@@ -1,7 +1,6 @@
 import { eq } from 'drizzle-orm'
 import { projectTable } from '~~/server/db/schema/project'
-import type { ErrorData } from '~~/server/errors'
-import { GENERIC_ERRORS } from '~~/server/errors'
+import { createCustomError } from '~~/server/errors'
 import type { User } from '~~/server/types'
 import { routeParamsSchema } from '~~/server/utils/validator'
 
@@ -10,10 +9,7 @@ const routeParamValidator = routeParamsSchema.pick({ projectId: true })
 export default defineEventHandler(async (event) => {
   const userAuthenticated: User = event.context.auth
   if (!userAuthenticated) {
-    throw createError({
-      statusCode: 401,
-      statusMessage: GENERIC_ERRORS['UNAUTHORIZED']['code'],
-    })
+    throw createCustomError('GENERIC', 'UNAUTHORIZED')
   }
 
   const routeParamsValidationResult = await getValidatedRouterParams(
@@ -22,14 +18,7 @@ export default defineEventHandler(async (event) => {
   )
 
   if (!routeParamsValidationResult.success) {
-    throw createError<ErrorData>({
-      statusCode: 400,
-      statusMessage: GENERIC_ERRORS['BAD_REQUEST']['code'],
-      data: {
-        scope: 'GENERIC',
-        ...GENERIC_ERRORS['BAD_REQUEST'],
-      }
-    })
+    throw createCustomError('GENERIC', 'BAD_REQUEST')
   }
 
   const { projectId } = routeParamsValidationResult.data
@@ -40,15 +29,7 @@ export default defineEventHandler(async (event) => {
     .where(eq(projectTable.id, projectId))
 
   if (!projectFound) {
-    throw createError<ErrorData>({
-      statusCode: 404,
-      statusMessage: GENERIC_ERRORS['NOT_FOUND']['code'],
-      data: {
-        ...GENERIC_ERRORS['NOT_FOUND'],
-        reason: 'The requested project could not be found in the database',
-        scope: 'GENERIC',
-      },
-    })
+    throw createCustomError('GENERIC', 'NOT_FOUND')
   }
 
   return {

@@ -1,12 +1,7 @@
 import type { authClient } from '~/lib/auth'
-import { GENERIC_ERROR_MESSAGES } from '.'
+import { GENERIC_ERROR_MESSAGES } from './generic'
 
-type ErrorTypes = Partial<
-  Record<
-    keyof typeof authClient.$ERROR_CODES,
-    string
-  >
->
+type ErrorTypes = Partial<Record<keyof typeof authClient.$ERROR_CODES, string>>
 
 export const AUTH_ERROR_MESSAGES = {
   USER_ALREADY_EXISTS: 'An account with this email already exists',
@@ -14,7 +9,7 @@ export const AUTH_ERROR_MESSAGES = {
   INVALID_EMAIL_OR_PASSWORD: 'Invalid email or password',
   EMAIL_NOT_VERIFIED: 'Please verify your account before signing in',
   INVALID_OTP: 'Invalid code. Please try again',
-  OTP_EXPIRED: 'Your verification code has expired. Please request a new one.'
+  OTP_EXPIRED: 'Your verification code has expired. Please request a new one.',
 } satisfies ErrorTypes
 
 export const getAuthErrorMessage = (code: string) => {

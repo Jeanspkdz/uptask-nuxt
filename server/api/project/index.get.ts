@@ -1,12 +1,9 @@
-import { GENERIC_ERRORS } from '~~/server/errors'
+import { createCustomError } from '~~/server/errors'
 
 export default defineEventHandler(async (event) => {
   const userAuthenticated: User = event.context.auth
   if (!userAuthenticated) {
-    return createError({
-      statusCode: 401,
-      statusMessage: GENERIC_ERRORS['UNAUTHORIZED']['code']
-    })
+    throw createCustomError('GENERIC', 'UNAUTHORIZED')
   }
 
   const userRelatedProjects = await db.query.user.findFirst({

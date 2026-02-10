@@ -1,19 +1,12 @@
-import z from 'zod'
-import type { ErrorData } from '~~/server/errors'
-import { GENERIC_ERRORS } from '~~/server/errors'
+import { createCustomError } from '~~/server/errors'
 import type { User } from '~~/server/types'
 
-const routeParamValidator = z.object({
-  projectId: z.cuid2({ error: 'Invalid format' }),
-})
+const routeParamValidator = routeParamsSchema.pick({ projectId: true })
 
 export default defineEventHandler(async (event) => {
   const userAuthenticated: User = event.context.auth
   if (!userAuthenticated) {
-    throw createError({
-      statusCode: 401,
-      statusMessage: GENERIC_ERRORS['UNAUTHORIZED']['code'],
-    })
+    throw createCustomError('GENERIC', 'UNAUTHORIZED')
   }
 
   const routeParamsValidationResult = await getValidatedRouterParams(
@@ -22,15 +15,7 @@ export default defineEventHandler(async (event) => {
   )
 
   if (!routeParamsValidationResult.success) {
-    throw createError<ErrorData>({
-      statusCode: 400,
-      statusMessage: GENERIC_ERRORS['BAD_REQUEST']['code'],
-      data: {
-        ...GENERIC_ERRORS['BAD_REQUEST'],
-        reason: z.prettifyError(routeParamsValidationResult.error),
-        scope: 'GENERIC',
-      },
-    })
+    throw createCustomError('GENERIC', 'BAD_REQUEST')
   }
 
   const { projectId } = routeParamsValidationResult.data
@@ -44,17 +29,12 @@ export default defineEventHandler(async (event) => {
       id: projectId,
     },
   })
+  console.log({
+    COLLLBAS: projectWithCollaborator
+  })
 
   if (!projectWithCollaborator) {
-    throw createError<ErrorData>({
-      statusCode: 404,
-      statusMessage: GENERIC_ERRORS['NOT_FOUND']['code'],
-      data: {
-        ...GENERIC_ERRORS['NOT_FOUND'],
-        reason: 'The requested project could not be found in the database',
-        scope: 'GENERIC',
-      },
-    })
+    throw createCustomError('GENERIC', 'NOT_FOUND')
   }
 
   return {

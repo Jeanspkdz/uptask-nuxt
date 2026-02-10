@@ -24,7 +24,7 @@
 
 <script setup lang="ts">
 import { toast } from 'vue-sonner'
-import { GENERIC_ERROR_MESSAGES } from '~/errors'
+import { getErrorMessage } from '~/errors'
 import { getAuthErrorMessage } from '~/errors/auth'
 import { authClient } from '~/lib/auth'
 
@@ -58,7 +58,7 @@ const handleOnComplete = async () => {
     toast.success('Verification successful!')
     return await navigateTo('/auth/sign-in')
   } catch {
-    toast.error(GENERIC_ERROR_MESSAGES['UNKNOWN'])
+    toast.error(getErrorMessage('GENERIC', 'UNKNOWN'))
   } finally {
     isLoading.value = false
   }

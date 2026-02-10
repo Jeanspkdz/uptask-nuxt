@@ -2,25 +2,25 @@
   <slot
     :tasks="projectTasks"
     :tasks-by-status="projectTasksByStatus"
-    :pending="pending"
+    :pending="isProjectTasksLoading"
   />
 </template>
 
 <script setup lang="ts">
-
 const route = useRoute()
 const projectId = route.params.projectId as string
 
-const { projectTasks, pending } = useProjectTasks(() => projectId)
+const { projectTasks, isProjectTasksLoading } = useProjectTasks(
+  () => projectId
+)
 
-const projectTasksByStatus = computed<Partial<Record<TaskState, ProjectTask[]>>>(() => {
-  if (pending.value || projectTasks.value === undefined) {
+const projectTasksByStatus = computed<
+  Partial<Record<TaskState, ProjectTask[]>>
+>(() => {
+  if (isProjectTasksLoading.value || projectTasks.value === undefined) {
     return {}
   }
-  const groupedTasks = Object.groupBy(
-    projectTasks.value,
-    (task) => task.state
-  )
+  const groupedTasks = Object.groupBy(projectTasks.value, (task) => task.state)
 
   const orderedGropuedTasks = Object.fromEntries(
     Object.entries(groupedTasks).map(([key, value]) => {
@@ -35,13 +35,8 @@ const projectTasksByStatus = computed<Partial<Record<TaskState, ProjectTask[]>>>
 provide(projectTasksKey, {
   projectTasks,
   projectTasksByStatus,
-  pending,
+  pending: isProjectTasksLoading,
   updateProjectTask (id, values) {
-    console.log('UPDATE TASK', {
-      id,
-      values,
-    })
-
     if (this.projectTasks.value) {
       this.projectTasks.value = this.projectTasks.value.map((task) => {
         if (task.id === id) {
@@ -55,8 +50,10 @@ provide(projectTasksKey, {
     projectTasks.value?.push(task)
   },
   deleteProjectTask (taskId) {
-    projectTasks.value = projectTasks.value?.filter(task => task.id !== taskId)
-  }
+    projectTasks.value = projectTasks.value?.filter(
+      (task) => task.id !== taskId
+    )
+  },
 })
 </script>
 

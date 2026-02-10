@@ -25,18 +25,10 @@
 </template>
 
 <script setup lang="ts">
-import { toast } from 'vue-sonner'
-import { getGenericErrorMessage, type GenericErrorKey } from '~/errors'
 
-const { errorCode } = defineProps<{
+defineProps<{
   errorStatusCode: number
-  errorCode: GenericErrorKey
 }>()
-
-onMounted(() => {
-  toast.error(getGenericErrorMessage(errorCode))
-})
-
 </script>
 
 <style scoped>

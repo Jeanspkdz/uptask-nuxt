@@ -71,8 +71,7 @@ import { toTypedSchema } from '@vee-validate/zod'
 import { useForm } from 'vee-validate'
 import { toast } from 'vue-sonner'
 import z from 'zod'
-import { GENERIC_ERROR_MESSAGES } from '~/errors'
-import { getProjectErrorMessage } from '~/errors/project'
+import { getErrorMessage } from '~/errors'
 
 definePageMeta({
   layout: 'home-layout',
@@ -95,8 +94,8 @@ const { isSubmitting, handleSubmit } = useForm({
   initialValues: {
     name: '',
     clientName: '',
-    description: ''
-  }
+    description: '',
+  },
 })
 
 const handleCreateProject = handleSubmit(async (data, actions) => {
@@ -111,12 +110,16 @@ const handleCreateProject = handleSubmit(async (data, actions) => {
           actions.resetForm()
           return
         }
-        toast.error(getProjectErrorMessage(response.statusText))
+        console.log('ERR_CREATE_PROJECT', response)
+
+        toast.error(
+          getErrorMessage(response._data.data.scope, response._data.data.code)
+        )
       },
     })
   } catch (error) {
     console.log('ERRR', error)
-    toast.error(GENERIC_ERROR_MESSAGES['UNKNOWN'])
+    toast.error(getErrorMessage('GENERIC', 'UNKNOWN'))
   }
 })
 </script>

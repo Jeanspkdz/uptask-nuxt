@@ -1,5 +1,5 @@
 import type { ProjectErrorCodes } from '#shared/types/error'
-import { GENERIC_ERROR_MESSAGES } from '.'
+import { GENERIC_ERROR_MESSAGES } from './generic'
 
 export const PROJECT_ERROR_MESSAGES = {
   NAME_AND_CLIENT_NAME_ALREADY_EXISTS: 'A project with this name already exists for the client',

@@ -1,35 +1,41 @@
-import type { ErrorCodes, ErrorScopes, GenericErrorCodes } from '#shared/types/error'
+import type { ErrorScopes } from '~~/shared/types/error'
+import { GENERIC_ERRORS } from './generic'
+import { PROJECT_ERRORS } from './project'
 
-export type ErrorData = ErrorDetails<ErrorCodes> & { reason?: string, scope: ErrorScopes }
-
-type GenericErrorDef = {
-  [K in GenericErrorCodes]: ErrorDetails<K>
+export type ErrorData = ErrorDetails<ErrorCodes> & {
+  reason?: string;
+  scope: ErrorScopes;
 }
 
 export type ErrorDetails<T extends string = string> = {
-  code: T,
-  message: string
+  code: T;
+  message: string;
+  status: number
 }
 
-export const GENERIC_ERRORS = {
-  FORBIDDEN: {
-    code: 'FORBIDDEN',
-    message: "You don't have permission to perform this action",
+type AllKeys<T extends object> = T extends T ? keyof T : never
+
+const ERRORS = {
+  PROJECT: {
+    ...PROJECT_ERRORS,
   },
-  UNAUTHORIZED: {
-    code: 'UNAUTHORIZED',
-    message: 'You need to be logged in to perform this action',
+  GENERIC: {
+    ...GENERIC_ERRORS,
   },
-  UNKNOWN: {
-    code: 'UNKNOWN',
-    message: 'Something went wrong. Please try again',
-  },
-  BAD_REQUEST: {
-    code: 'BAD_REQUEST',
-    message: 'The request was invalid or cannot be processed',
-  },
-  NOT_FOUND: {
-    code: 'NOT_FOUND',
-    message: 'The requested resource could not be found'
-  }
-} satisfies GenericErrorDef
+} as const satisfies Record<Exclude<ErrorScopes, 'AUTH'>, Record<string, ErrorDetails>>
+
+export const createCustomError = <Scope extends keyof typeof ERRORS>(
+  scope: Scope,
+  errCode: AllKeys<typeof ERRORS[Scope]>
+) => {
+  const error = ERRORS[scope][errCode] as ErrorDetails<typeof errCode>
+
+  return createError<ErrorData>({
+    status: error.status,
+    statusText: error.code,
+    data: {
+      ...error,
+      scope
+    }
+  })
+}

@@ -3,8 +3,7 @@ import { readValidatedBody } from 'h3'
 import { FetchError } from 'ofetch'
 import { z } from 'zod'
 import { projectTaskTable } from '~~/server/db/schema/project-task'
-import type { ErrorData } from '~~/server/errors'
-import { GENERIC_ERRORS } from '~~/server/errors'
+import { createCustomError, type ErrorData } from '~~/server/errors'
 import { projectTaskReorderSchema } from '~~/server/utils/validator'
 
 const routeBodyValidator = z.array(projectTaskReorderSchema)
@@ -18,16 +17,7 @@ export default defineEventHandler(async (event) => {
 
     if (!validatedBody.success) {
       console.log(z.prettifyError(validatedBody.error))
-
-      throw createError<ErrorData>({
-        statusCode: 400,
-        statusMessage: GENERIC_ERRORS['BAD_REQUEST']['code'],
-        data: {
-          ...GENERIC_ERRORS['BAD_REQUEST'],
-          reason: 'Request payload failed validation',
-          scope: 'GENERIC',
-        },
-      })
+      throw createCustomError('GENERIC', 'BAD_REQUEST')
     }
 
     const data = validatedBody.data
@@ -62,7 +52,7 @@ export default defineEventHandler(async (event) => {
 
     return reorderedTasks
   } catch (error) {
-    console.log('[RERORDER_TASKS_ERROR]', error)
+    console.log('[REORDER_TASKS_ERROR]', error)
 
     if (error instanceof FetchError) {
       throw createError<ErrorData>({
@@ -70,14 +60,6 @@ export default defineEventHandler(async (event) => {
       })
     }
 
-    throw createError<ErrorData>({
-      statusCode: 500,
-      statusMessage: GENERIC_ERRORS['UNKNOWN']['code'],
-      data: {
-        ...GENERIC_ERRORS['UNKNOWN'],
-        scope: 'GENERIC',
-        reason: 'An unexpected error ocurred',
-      },
-    })
+    throw createCustomError('GENERIC', 'UNKNOWN')
   }
 })
