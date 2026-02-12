@@ -42,7 +42,7 @@ export default defineEventHandler(async (event) => {
     )
 
   if (!project) {
-    throw createCustomError('GENERIC', 'BAD_REQUEST')
+    throw createCustomError('GENERIC', 'FORBIDDEN')
   }
 
   const routeBodyValidationResult = await readValidatedBody(
@@ -56,15 +56,20 @@ export default defineEventHandler(async (event) => {
 
   const { userId } = routeBodyValidationResult.data
 
-  const [collaborator] = await db
+  await db
     .insert(collaboratorTable)
     .values({
       userId,
       projectId,
     })
-    .returning()
+
+  const addedCollaborator = await db.query.user.findFirst({
+    where: {
+      id: userId
+    }
+  })
 
   return {
-    collaborator,
+    collaborator: addedCollaborator,
   }
 })

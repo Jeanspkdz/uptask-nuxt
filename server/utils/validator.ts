@@ -7,12 +7,13 @@ import { userTable } from '#server/db/schema/auth-schema'
 import { projectTaskTable } from '#server/db/schema/project-task'
 import z from 'zod'
 import { projectTable } from '#server/db/schema/project'
+import { collaboratorTable } from '../db/schema/collaborator'
 
 export const projectSelectSchema = createSelectSchema(projectTable)
 export const projectInsertchema = createInsertSchema(projectTable)
 export const projectUpdateSchema = createUpdateSchema(projectTable)
-// type A = z.infer<typeof projectUpdateSchema>
-// type B = z.infer<typeof projectSelectSchema>
+// type A = z.infer<typeof userSelectSchema>
+// type B = z.infer<typeof collaboratorSelectSchema>
 // type C = z.infer<typeof projectTaskInsertSchema>
 
 export const projectTaskSelectSchema = createSelectSchema(projectTaskTable)
@@ -28,6 +29,8 @@ export const projectTaskReorderSchema = projectTaskSelectSchema.pick({
 
 export const userSelectSchema = createSelectSchema(userTable)
 export const userInsertSchema = createInsertSchema(userTable)
+
+export const collaboratorSelectSchema = createSelectSchema(collaboratorTable)
 
 // ROUTE_PARAMS
 export const routeParamsSchema = z.object({

@@ -8,7 +8,10 @@
       <NuxtLink to="/project/create"> Add new project </NuxtLink>
     </Button>
 
-    <div v-if="projects && !isProjectsPending" class="space-y-4 mt-6">
+    <div v-if="isProjectsPending" class="space-y-4 mt-6">
+      <ProjectCardSkeleton v-for="i in 5" :key="i"/>
+    </div>
+    <div v-else-if="projects" class="space-y-4 mt-6">
       <NuxtLink
         v-for="ownedProject in projects.ownedProjects"
         :key="ownedProject.id"
@@ -49,9 +52,6 @@ definePageMeta({
 })
 
 const { projects, isProjectsPending } = useProjects()
-watchEffect(() => {
-  console.log(projects.value)
-})
 
 </script>
 

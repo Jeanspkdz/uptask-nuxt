@@ -1,6 +1,10 @@
 import { createCustomError } from '~~/server/errors'
 
 export default defineEventHandler(async (event) => {
+  // await new Promise((resolve) => {
+  //   setTimeout(resolve, 5000)
+  // })
+
   const userAuthenticated: User = event.context.auth
   if (!userAuthenticated) {
     throw createCustomError('GENERIC', 'UNAUTHORIZED')

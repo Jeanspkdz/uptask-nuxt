@@ -1,7 +1,6 @@
 import { and, ilike, ne } from 'drizzle-orm'
 import { userTable } from '~~/server/db/schema/auth-schema'
-import type { ErrorData } from '~~/server/errors'
-import { GENERIC_ERRORS } from '~~/server/errors/generic'
+import { createCustomError } from '~~/server/errors'
 import type { User } from '~~/server/types'
 import { userSelectSchema } from '~~/server/utils/validator'
 
@@ -10,10 +9,7 @@ const routeQueryParamsValidator = userSelectSchema.pick({ email: true })
 export default defineEventHandler(async (event) => {
   const userAuthenticated: User = event.context.auth
   if (!userAuthenticated) {
-    throw createError({
-      statusCode: 401,
-      statusMessage: GENERIC_ERRORS['UNAUTHORIZED']['code'],
-    })
+    throw createCustomError('GENERIC', 'UNAUTHORIZED')
   }
 
   const validationResult = await getValidatedQuery(
@@ -22,14 +18,7 @@ export default defineEventHandler(async (event) => {
   )
 
   if (!validationResult.success) {
-    throw createError<ErrorData>({
-      statusCode: 400,
-      statusMessage: GENERIC_ERRORS['BAD_REQUEST']['code'],
-      data: {
-        ...GENERIC_ERRORS['BAD_REQUEST'],
-        scope: 'GENERIC',
-      },
-    })
+    throw createCustomError('GENERIC', 'BAD_REQUEST')
   }
 
   const { email } = validationResult.data

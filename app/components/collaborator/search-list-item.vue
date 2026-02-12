@@ -2,12 +2,17 @@
   <article class="flex justify-between items-center">
     <span>{{ userEmail }}</span>
     <Button
-      :disabled="isLoading"
+      :disabled="isLoading || isAdded"
       variant="ghost"
-      class="bg-purple-200/75 text-purple-600 hover:bg-purple-300 hover:text-purple-600 hover:cursor-pointer transition-colors"
+      class="hover:cursor-pointer transition-colors"
+      :class="
+        isAdded
+          ? 'bg-green-200/75 text-green-600 hover:bg-green-300 hover:text-green-800 hover:cursor-not-allowed'
+          : 'bg-purple-200/75 text-purple-600 hover:bg-purple-300 hover:text-purple-600 cursor-not-allowed opacity-60'
+      "
       @click="handleAddCollaborator(userId)"
     >
-      Add to project
+      {{ isAdded ? "Already added" : "Add to Project" }}
     </Button>
   </article>
 </template>
@@ -17,8 +22,13 @@ import { toast } from 'vue-sonner'
 import { getErrorMessage } from '~/errors'
 
 defineProps<{
-  userEmail: string,
-  userId: string
+  userEmail: string;
+  userId: string;
+  isAdded: boolean;
+}>()
+
+const emit = defineEmits<{
+  'collaborator-added': [collaborator: User]
 }>()
 
 const route = useRoute()
@@ -37,7 +47,7 @@ const handleAddCollaborator = async (userId: string) => {
       onResponse ({ response }) {
         if (response.ok) {
           console.log('RES_SUCCES', response)
-
+          emit('collaborator-added', response._data.collaborator)
           toast.success('Collaborator added successfully! ')
           return
         }
@@ -54,7 +64,6 @@ const handleAddCollaborator = async (userId: string) => {
     isLoading.value = false
   }
 }
-
 </script>
 
 <style scoped></style>

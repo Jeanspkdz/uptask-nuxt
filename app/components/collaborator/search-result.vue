@@ -1,16 +1,18 @@
 <template>
   <div>
-    <p v-if="foundUsers.length === 0" class="italic text-center font-semibold">
+    <p v-if="users.length === 0" class="italic text-center font-semibold">
       No Users Found
     </p>
     <div v-else class="mt-3">
       <h3 class="font-semibold text-center">Results:</h3>
       <ul>
-        <li v-for="user in foundUsers" :key="user.id" class="">
+        <li v-for="user in users" :key="user.id" class="">
           <div class="space-y-2">
             <CollaboratorSearchListItem
               :user-email="user.email"
               :user-id="user.id"
+              :is-added="user.isAdded"
+              @collaborator-added="(collab) => $emit('collaborator-added', collab)"
             />
           </div>
         </li>
@@ -22,7 +24,11 @@
 <script setup lang="ts">
 
 defineProps<{
-  foundUsers: User[];
+  users: Array<User & { isAdded: boolean }>;
+}>()
+
+defineEmits<{
+  'collaborator-added': [collaborator: User]
 }>()
 
 </script>

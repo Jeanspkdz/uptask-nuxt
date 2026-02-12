@@ -20,7 +20,7 @@ export default defineEventHandler(async (event) => {
 
   const { projectId } = routeParamsValidationResult.data
 
-  const [projectWithCollaborator] = await db.query.project.findMany({
+  const projectWithCollaborator = await db.query.project.findFirst({
     columns: {},
     with: {
       collaborator: true,
