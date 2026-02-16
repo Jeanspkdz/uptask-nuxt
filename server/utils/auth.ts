@@ -9,26 +9,39 @@ export const auth = betterAuth({
     provider: 'pg',
     schema: {
       ...authSchema,
-      user: authSchema.userTable
-    }
+      user: authSchema.userTable,
+    },
   }),
   emailAndPassword: {
     enabled: true,
-    // requireEmailVerification: true
+  },
+  emailVerification: {
+    async sendVerificationEmail ({ url, user }) {
+      sendVerificationEmail({
+        email: user.email,
+        url,
+      })
+    }
+  },
+  user: {
+    changeEmail: {
+      enabled: true,
+      updateEmailWithoutVerification: true, // Just when email is not verified
+    },
   },
   plugins: [
     emailOTP({
       overrideDefaultEmailVerification: true,
       async sendVerificationOTP ({ email, otp, type }) {
         if (type === 'email-verification') {
-          await sendVerificationOTPEmail({
+          sendVerificationOTPEmail({
             email,
-            otp
+            otp,
           })
         }
       },
       expiresIn: 600,
       // sendVerificationOnSignUp: true
-    })
-  ]
+    }),
+  ],
 })

@@ -162,11 +162,7 @@ const handleSingUp = handleSubmit(async ({ email, username, password }, actions)
       name: username,
     },
     {
-      onRequest: (ctx) => {
-        console.log('OnRequest', ctx)
-      },
       onSuccess (context) {
-        console.log('OnSuccess', context)
         authClient.emailOtp.sendVerificationOtp({
           email: context.data.user.email,
           type: 'email-verification',
@@ -180,7 +176,6 @@ const handleSingUp = handleSubmit(async ({ email, username, password }, actions)
       },
       onError (context) {
         console.log('OnError', context)
-        // toast.error(getAuthErrorMessage(context.error.code))
         toast.error(getErrorMessage('AUTH', context.error.code))
       },
     }

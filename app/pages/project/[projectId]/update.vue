@@ -2,7 +2,7 @@
   <section class="max-w-10/12 mx-auto min-h-full my-auto">
     <ProjectError
       v-if="error"
-      :error-code="error.statusMessage as GenericErrorKey ?? 'UNKNOWN'"
+      :error-code="error.statusMessage ?? 'UNKNOWN'"
       :error-status-code="error.statusCode ?? 400"
     />
 
@@ -86,7 +86,6 @@ import z from 'zod'
 import FormItem from '~/components/ui/form/FormItem.vue'
 import {
   getErrorMessage,
-  type GenericErrorKey
 } from '~/errors'
 
 definePageMeta({
@@ -139,7 +138,7 @@ const handleUpdateProject = handleSubmit(async (values, actions) => {
       },
     })
   } catch (error) {
-    console.log('ERR_UPDATE_PROJECT', error)
+    console.log('[ERR_UPDATE_PROJECT]', error)
     toast.error(getErrorMessage('GENERIC', 'UNKNOWN'))
   }
 })

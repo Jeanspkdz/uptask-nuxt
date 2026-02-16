@@ -10,6 +10,8 @@ export const AUTH_ERROR_MESSAGES = {
   EMAIL_NOT_VERIFIED: 'Please verify your account before signing in',
   INVALID_OTP: 'Invalid code. Please try again',
   OTP_EXPIRED: 'Your verification code has expired. Please request a new one.',
+  INVALID_PASSWORD: 'The password you entered is incorrect.'
+
 } satisfies ErrorTypes
 
 export const getAuthErrorMessage = (code: string) => {

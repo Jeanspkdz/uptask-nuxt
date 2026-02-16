@@ -34,6 +34,8 @@ definePageMeta({
 
 const route = useRoute()
 const userEmail = route.query.email?.toString() ?? ''
+
+const otpCode = ref<string[]>([])
 const isLoading = ref(false)
 
 const handleOnComplete = async () => {
@@ -64,7 +66,6 @@ const handleOnComplete = async () => {
   }
 }
 
-const otpCode = ref<string[]>([])
 </script>
 
 <style scoped></style>
