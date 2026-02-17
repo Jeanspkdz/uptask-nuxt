@@ -4,9 +4,12 @@ import { FetchError } from 'ofetch'
 import { z } from 'zod'
 import { projectTaskTable } from '~~/server/db/schema/project-task'
 import { createCustomError, type ErrorData } from '~~/server/errors'
-import { projectTaskReorderSchema } from '~~/server/utils/validator'
 
-const routeBodyValidator = z.array(projectTaskReorderSchema)
+const routeBodyValidator = z.array(projectTaskSelectSchema.pick({
+  id: true,
+  state: true,
+  order: true,
+}))
 
 export default defineEventHandler(async (event) => {
   try {
@@ -21,6 +24,7 @@ export default defineEventHandler(async (event) => {
     }
 
     const data = validatedBody.data
+    console.log('DATA', data)
 
     const reorderedTasks = await db.transaction(
       async (tx) => {
@@ -32,8 +36,6 @@ export default defineEventHandler(async (event) => {
           return tx
             .update(projectTaskTable)
             .set({
-              name: pTask.name,
-              description: pTask.description,
               order: pTask.order,
               state: pTask.state,
             })

@@ -2,7 +2,7 @@ import type { InjectionKey } from 'vue'
 
 export type ProjectTasksKey = {
   projectTasks: Ref<ProjectTask[] | undefined>;
-  projectTasksByStatus: ComputedRef<Partial<Record<TaskState, ProjectTask[]>>>;
+  projectTasksByStatus: ComputedRef<Record<TaskState, ProjectTask[]>>;
   pending: Ref<boolean>;
   updateProjectTask: (
     id: ProjectTask['id'],

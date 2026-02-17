@@ -19,13 +19,6 @@ export const projectUpdateSchema = createUpdateSchema(projectTable)
 export const projectTaskSelectSchema = createSelectSchema(projectTaskTable)
 export const projectTaskInsertSchema = createInsertSchema(projectTaskTable)
 export const projectTaskUpdateSchema = createUpdateSchema(projectTaskTable)
-export const projectTaskReorderSchema = projectTaskSelectSchema.pick({
-  id: true,
-  state: true,
-  description: true,
-  order: true,
-  name: true,
-})
 
 export const userSelectSchema = createSelectSchema(userTable)
 export const userInsertSchema = createInsertSchema(userTable)

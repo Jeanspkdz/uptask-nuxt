@@ -36,6 +36,10 @@ const emit = defineEmits<{
 }>()
 
 const projectTasksProvider = inject(projectTasksKey)
+if (!projectTasksProvider) {
+  throw new Error('ProjectTasksProvider not found')
+}
+
 const localNewState = ref(props.taskState)
 const isSubmitting = ref(false)
 
@@ -55,7 +59,8 @@ const handleUpdateTaskState = async (state: TaskState | null) => {
     if (!state) return
     isSubmitting.value = true
 
-    const tasksFromPreviousState = projectTasksProvider?.projectTasksByStatus.value[props.taskState]
+    const tasksFromPreviousState = projectTasksProvider.projectTasksByStatus.value[props.taskState]
+
     const currentTaskIndex = tasksFromPreviousState?.findIndex(task => task.id === props.taskId) as number
 
     const reorderedTasksFromPreviousState = tasksFromPreviousState?.map((task, index) => {
@@ -72,12 +77,16 @@ const handleUpdateTaskState = async (state: TaskState | null) => {
     const tasksFromNewState = projectTasksProvider?.projectTasksByStatus.value[state]
     const lastTaskOrder = tasksFromNewState ? tasksFromNewState.length + 1 : 1
 
-    await $fetch(`/api/project/${projectId}/task/${props.taskId}`, {
+    await $fetch(`/api/project/${projectId}/task/reorder`, {
       method: 'PUT',
-      body: {
-        state,
-        order: lastTaskOrder
-      },
+      body: [
+        {
+          id: props.taskId,
+          order: lastTaskOrder,
+          state
+        },
+        ...reorderedTasksFromPreviousStateFiltered
+      ],
       ignoreResponseError: true,
       onResponse ({ response }) {
         if (response.ok) {
@@ -89,11 +98,6 @@ const handleUpdateTaskState = async (state: TaskState | null) => {
           getErrorMessage(response._data.data.scope, response._data.data.code)
         )
       },
-    })
-
-    await $fetch(`/api/project/${projectId}/task/reorder`, {
-      method: 'PUT',
-      body: reorderedTasksFromPreviousStateFiltered
     })
   } catch (error) {
     console.log('[ERROR_UPDATE_TASK_STATE]', error)
