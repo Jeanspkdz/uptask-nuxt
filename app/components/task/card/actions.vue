@@ -80,6 +80,11 @@ const currentCardModalType = ref<CardModalTypes>('detail')
 const changeCardModalType = (modalType: CardModalTypes) => {
   currentCardModalType.value = modalType
 }
+
+const app = useNuxtApp()
+watchEffect(() => {
+  console.log(app.payload)
+})
 </script>
 
 <style scoped></style>

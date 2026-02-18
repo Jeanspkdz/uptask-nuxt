@@ -40,62 +40,66 @@
         @task-state-change="handleUpdateTaskState"
       />
 
-      <form @submit="handleCreateNote">
-        <VeeField v-slot="{ field, errors }" name="noteName">
-          <Field>
-            <FieldLabel class="font-bold">Create Note</FieldLabel>
-            <Input placeholder="Note Content" v-bind="field" />
-
-            <FieldError v-if="errors.length" :errors="errors" />
-          </Field>
-        </VeeField>
-
-        <Field class="mt-4">
-          <Button type="submit" :disabled="!meta.valid"> Create Note </Button>
-        </Field>
-      </form>
+      <NoteFormCreate
+        :project-id="projectId"
+        :task-id="taskDetails.id"
+        @create-note="(e) => handleCreateNote(e)"
+      />
+      <NoteList
+        class="mt-5"
+        :notes="notes"
+        :is-loading="isNotesPending"
+        :current-user-id="authStore.user?.id"
+        :project-id="projectId"
+        :user-role="project?.userRole ?? 'collaborator'"
+        @delete-note="handleDeleteNote"
+      />
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { toTypedSchema } from '@vee-validate/zod'
-import { useForm, Field as VeeField } from 'vee-validate'
-import z from 'zod'
-
-defineProps<{
+const { taskDetails } = defineProps<{
   taskDetails: Pick<
     ProjectTask,
     'id' | 'name' | 'state' | 'createdAt' | 'updatedAt' | 'description'
   >;
 }>()
-
-const createNoteSchema = toTypedSchema(
-  z.object({
-    noteName: z
-      .string()
-      .min(8, { error: 'A minimum length of 8 chracter is required' }),
-  })
-)
-
-const { handleSubmit, meta } = useForm({
-  validationSchema: createNoteSchema,
-  initialValues: {
-    noteName: '',
-  },
-  validateOnMount: false,
-})
-
-const handleCreateNote = handleSubmit((val) => {
-  console.log(val)
-})
+const route = useRoute()
+const projectId = computed(() => route.params.projectId as string)
 
 const projectTasksProvider = inject(projectTasksKey)
-
-const handleUpdateTaskState = (taskId: string, state: TaskState, order: number) => {
+const handleUpdateTaskState = (
+  taskId: string,
+  state: TaskState,
+  order: number
+) => {
   projectTasksProvider?.updateProjectTask(taskId, { state, order })
 }
 
+const authStore = useAuthStore()
+const { project } = useProject(() => projectId.value)
+
+const { notes, isNotesPending, addNote, deleteNote } = useTaskNotes(
+  () => projectId.value,
+  () => taskDetails.id
+)
+
+const handleCreateNote = (note: TaskNote) => {
+  if (authStore.user) {
+    addNote({
+      ...note,
+      owner: {
+        id: authStore.user?.id,
+        name: authStore.user?.name,
+      },
+    })
+  }
+}
+
+const handleDeleteNote = (noteId: string) => {
+  deleteNote(noteId)
+}
 </script>
 
 <style scoped></style>

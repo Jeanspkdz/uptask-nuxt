@@ -6,7 +6,7 @@ import { projectTaskTable } from './project-task'
 import { userTable } from './auth-schema'
 
 export const taskNoteTable = pgTable('task-note', {
-  id: t.text().$defaultFn(() => createId()),
+  id: t.text().primaryKey().$defaultFn(() => createId()),
   description: t.text().notNull(),
   taskId: t
     .text('task_id')

@@ -19,7 +19,8 @@ export const useProject = (projectId: MaybeRefOrGetter<string>) => {
         userRole
       }
     },
-    lazy: true
+    lazy: true,
+    key: `project-${toValue(projectId)}`
   })
 
   const project = computed(() => data.value)

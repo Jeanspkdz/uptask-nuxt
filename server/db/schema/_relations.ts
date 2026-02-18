@@ -41,6 +41,7 @@ export const relations = defineRelations(
       owner: r.one.user({
         from: r.taskNote.userId,
         to: r.user.id,
+        optional: false
       }),
     },
   })

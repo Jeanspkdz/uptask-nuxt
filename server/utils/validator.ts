@@ -8,6 +8,7 @@ import { projectTaskTable } from '#server/db/schema/project-task'
 import z from 'zod'
 import { projectTable } from '#server/db/schema/project'
 import { collaboratorTable } from '../db/schema/collaborator'
+import { taskNoteTable } from '../db/schema/task-note'
 
 export const projectSelectSchema = createSelectSchema(projectTable)
 export const projectInsertchema = createInsertSchema(projectTable)
@@ -25,8 +26,12 @@ export const userInsertSchema = createInsertSchema(userTable)
 
 export const collaboratorSelectSchema = createSelectSchema(collaboratorTable)
 
+export const taskNoteSelectSchema = createSelectSchema(taskNoteTable)
+export const taskNoteInsertSchema = createInsertSchema(taskNoteTable)
+
 // ROUTE_PARAMS
 export const routeParamsSchema = z.object({
   projectId: z.cuid2(),
   taskId: z.cuid2(),
+  noteId: z.cuid2(),
 })
