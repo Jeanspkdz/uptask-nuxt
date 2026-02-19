@@ -29,10 +29,6 @@ export default function useCollaborator (projectId: MaybeRefOrGetter<string>) {
     }
   }
 
-  watchEffect(() => {
-    console.log(collaborators.value)
-  })
-
   return {
     collaborators,
     deleteCollaborator,

@@ -29,7 +29,7 @@
 
 <script setup lang="ts">
 const { currentCollaborators } = defineProps<{
-  currentCollaborators: Omit<User, 'createdAt' | 'updatedAt'>[];
+  currentCollaborators: User[];
 }>()
 
 defineEmits<{
@@ -39,7 +39,11 @@ defineEmits<{
 const foundUsers = ref<Array<User & { isAdded: boolean }> | null>(null)
 
 const handleSearchResult = (collaborators: User[]) => {
-  const enrichedCollaborators = collaborators.map((collaborator) => {
+  const enrichedCollaborators = enricheCollaboratorsData(collaborators)
+  foundUsers.value = [...enrichedCollaborators]
+}
+const enricheCollaboratorsData = (collaborators: User[]) => {
+  return collaborators.map((collaborator) => {
     const isAdded = currentCollaborators.some(
       (currentCollaborator) => currentCollaborator.id === collaborator.id
     )
@@ -48,8 +52,13 @@ const handleSearchResult = (collaborators: User[]) => {
       isAdded,
     }
   })
-  foundUsers.value = [...enrichedCollaborators]
 }
+
+watch(() => currentCollaborators, () => {
+  if (foundUsers.value) {
+    foundUsers.value = enricheCollaboratorsData(foundUsers.value)
+  }
+}, { deep: true })
 
 const handleCloseAutoFocus = () => {
   foundUsers.value = null

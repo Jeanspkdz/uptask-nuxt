@@ -17,7 +17,10 @@
     <div v-if="isCollaboratorsLoading">
       <CollaboratorCardSkeleton v-for="value in 5" :key="value" />
     </div>
-    <div v-else-if="collaborators && collaborators?.length > 0">
+    <div
+      v-else-if="collaborators && collaborators?.length > 0"
+      class="space-y-2"
+    >
       <CollaboratorCard
         v-for="collaborator in collaborators"
         :key="collaborator.id"
@@ -27,9 +30,9 @@
     </div>
     <div
       v-else-if="collaborators?.length === 0"
-      class="italic text-slate-800 text-center text-lg font-semibold  mt-5 "
+      class="italic text-slate-800 text-center text-lg font-semibold mt-5"
     >
-       No collaborators yet
+      No collaborators yet
     </div>
   </div>
 </template>
@@ -41,14 +44,18 @@ definePageMeta({
 
 const route = useRoute()
 const projectId = route.params.projectId as string
-const { collaborators, isCollaboratorsLoading, deleteCollaborator, addCollaborator } =
-  useCollaborator(() => projectId)
+const {
+  collaborators,
+  isCollaboratorsLoading,
+  deleteCollaborator,
+  addCollaborator,
+} = useCollaborator(() => projectId)
 
 const handleCollaboratorDeleted = (collaboratorId: string) => {
   deleteCollaborator(collaboratorId)
 }
 
-const handleCollaboratorAdded = (collaborator : User) => {
+const handleCollaboratorAdded = (collaborator: User) => {
   addCollaborator(collaborator)
 }
 </script>
