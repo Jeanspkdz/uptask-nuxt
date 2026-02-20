@@ -29,10 +29,21 @@ export const useProjects = () => {
           ownedProjects
         }
       },
+      deep: true
     }
   )
+
+  const deleteProject = (projectId: string) => {
+    console.log('DELETE', projectId)
+
+    if (projects.value) {
+      projects.value.ownedProjects = projects.value?.ownedProjects.filter(project => project.id !== projectId)
+    }
+  }
+
   return {
     projects,
     isProjectsPending,
+    deleteProject
   }
 }

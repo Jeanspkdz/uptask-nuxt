@@ -1,4 +1,3 @@
-import type { ProjectErrorCodes } from '#shared/types/error'
 import type { ErrorDetails } from '.'
 
 export type ProjectErrors = {

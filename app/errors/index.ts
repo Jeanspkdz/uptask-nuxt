@@ -2,11 +2,13 @@ import { AUTH_ERROR_MESSAGES } from './auth'
 import { GENERIC_ERROR_MESSAGES } from './generic'
 import { PROJECT_ERROR_MESSAGES } from './project'
 
-type GetAllKeys<T> = T extends T ? keyof T : never
-type UnionErrorCodes = (typeof ERRORS)[ErrorScopes]
-export type AvailableErrorCodes = GetAllKeys<UnionErrorCodes>
+type ErrorMap = {
+  [Scope in keyof ErrorScopesGroup]: {
+    [K in ErrorScopesGroup[Scope]]: string;
+  };
+}
 
-export const ERRORS = {
+export const ERRORS: ErrorMap = {
   AUTH: {
     ...AUTH_ERROR_MESSAGES,
   },
@@ -16,12 +18,12 @@ export const ERRORS = {
   PROJECT: {
     ...PROJECT_ERROR_MESSAGES,
   },
-} as const satisfies Record<ErrorScopes, { [k: string]: string }>
+}
 
-export function getErrorMessage<Scope extends ErrorScopes = 'GENERIC'> (
-  scope: Scope,
-  code: GetAllKeys<(typeof ERRORS)[Scope]>
-) {
+export function getErrorMessage<
+  Scope extends ErrorScopes,
+  Code extends AllKeys<ErrorMap[Scope]>
+> (scope: Scope, code: Code) {
   if (ERRORS[scope][code]) {
     return ERRORS[scope][code]
   }

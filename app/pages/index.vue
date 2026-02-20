@@ -9,7 +9,7 @@
     </Button>
 
     <div v-if="isProjectsPending" class="space-y-4 mt-6">
-      <ProjectCardSkeleton v-for="i in 5" :key="i"/>
+      <ProjectCardSkeleton v-for="i in 5" :key="i" />
     </div>
     <div v-else-if="projects" class="space-y-4 mt-6">
       <NuxtLink
@@ -24,6 +24,7 @@
           :client-name="ownedProject.clientName"
           :description="ownedProject.description"
           :role="ownedProject.projectRole"
+           @delete-project="(e) => handleDeleteProject(e)"
         />
       </NuxtLink>
 
@@ -39,6 +40,7 @@
           :client-name="collaboratorProject.clientName"
           :description="collaboratorProject.description"
           :role="collaboratorProject.projectRole"
+          @delete-project="(e) => handleDeleteProject(e)"
         />
       </NuxtLink>
     </div>
@@ -46,13 +48,15 @@
 </template>
 
 <script setup lang="ts">
-
 definePageMeta({
   layout: 'home-layout',
 })
 
-const { projects, isProjectsPending } = useProjects()
+const { projects, isProjectsPending, deleteProject } = useProjects()
 
+const handleDeleteProject = (projectId: string) => {
+  deleteProject(projectId)
+}
 </script>
 
 <style scoped></style>
